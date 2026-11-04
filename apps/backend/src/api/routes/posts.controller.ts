@@ -8,7 +8,6 @@ import {
   Post,
   Put,
   Query,
-  Res,
 } from '@nestjs/common';
 import { PostsService } from '@gitroom/nestjs-libraries/database/prisma/posts/posts.service';
 import { GetOrgFromRequest } from '@gitroom/nestjs-libraries/user/org.from.request';
@@ -17,10 +16,6 @@ import { GetPostsDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.dto'
 import { GetPostsListDto } from '@gitroom/nestjs-libraries/dtos/posts/get.posts.list.dto';
 import { CheckPolicies } from '@gitroom/backend/services/auth/permissions/permissions.ability';
 import { ApiTags } from '@nestjs/swagger';
-import { GeneratorDto } from '@gitroom/nestjs-libraries/dtos/generator/generator.dto';
-import { CreateGeneratedPostsDto } from '@gitroom/nestjs-libraries/dtos/generator/create.generated.posts.dto';
-import { AgentGraphService } from '@gitroom/nestjs-libraries/agent/agent.graph.service';
-import { Response } from 'express';
 import { GetUserFromRequest } from '@gitroom/nestjs-libraries/user/user.from.request';
 import { ShortLinkService } from '@gitroom/nestjs-libraries/short-linking/short.link.service';
 import { CreateTagDto } from '@gitroom/nestjs-libraries/dtos/posts/create.tag.dto';
@@ -40,7 +35,6 @@ import { RealIP } from 'nestjs-real-ip';
 export class PostsController {
   constructor(
     private _postsService: PostsService,
-    private _agentGraphService: AgentGraphService,
     private _shortLinkService: ShortLinkService
   ) {}
 
@@ -248,43 +242,6 @@ export class PostsController {
     return this._postsService.createPost(org.id, body, 'WEB');
   }
 
-  @Post('/generator/draft')
-  @CheckPolicies([AuthorizationActions.Create, Sections.POSTS_PER_MONTH])
-  generatePostsDraft(
-    @GetOrgFromRequest() org: Organization,
-    @Body() body: CreateGeneratedPostsDto
-  ) {
-    return this._postsService.generatePostsDraft(org.id, body);
-  }
-
-  @Post('/generator')
-  @CheckPolicies([AuthorizationActions.Create, Sections.POSTS_PER_MONTH])
-  async generatePosts(
-    @GetOrgFromRequest() org: Organization,
-    @Body() body: GeneratorDto,
-    @Res({ passthrough: false }) res: Response
-  ) {
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    try {
-      for await (const event of this._agentGraphService.start(org.id, body)) {
-        res.write(JSON.stringify(event) + '\n');
-      }
-    } catch (err) {
-      // The stream has already started, so we cannot surface a normal HTTP
-      // error here. Emit a final error event on the open stream instead, so the
-      // client can stop and show the message rather than hang on a truncated
-      // stream. HttpExceptions carry a curated, user-facing message (e.g. the
-      // AI safety rejection); anything else gets a generic message.
-      const message =
-        err instanceof HttpException
-          ? err.message
-          : 'Something went wrong while generating your posts, please try again.';
-      res.write(JSON.stringify({ name: 'error', error: true, message }) + '\n');
-    }
-
-    res.end();
-  }
-
   @Delete('/:group')
   deletePost(
     @GetOrgFromRequest() org: Organization,
@@ -304,13 +261,5 @@ export class PostsController {
     @Body('republish') republish = false
   ) {
     return this._postsService.changeDate(org.id, id, date, action, republish);
-  }
-
-  @Post('/separate-posts')
-  async separatePosts(
-    @GetOrgFromRequest() org: Organization,
-    @Body() body: { content: string; len: number }
-  ) {
-    return this._postsService.separatePosts(body.content, body.len);
   }
 }

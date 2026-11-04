@@ -36,7 +36,6 @@ import sharp from 'sharp';
 import { UploadFactory } from '@gitroom/nestjs-libraries/upload/upload.factory';
 import { Readable } from 'stream';
 import { resolve, sep } from 'path';
-import { OpenaiService } from '@gitroom/nestjs-libraries/openai/openai.service';
 dayjs.extend(utc);
 import * as Sentry from '@sentry/nestjs';
 import { TemporalService } from 'nestjs-temporal-core';
@@ -73,7 +72,6 @@ export class PostsService {
     private _integrationService: IntegrationService,
     private _mediaService: MediaService,
     private _shortLinkService: ShortLinkService,
-    private _openaiService: OpenaiService,
     private _temporalService: TemporalService,
     private _refreshIntegrationService: RefreshIntegrationService
   ) {}
@@ -1371,10 +1369,6 @@ export class PostsService {
       postId: output.postId,
       publishDate: date,
     };
-  }
-
-  async separatePosts(content: string, len: number) {
-    return this._openaiService.separatePosts(content, len);
   }
 
   async changeState(id: string, state: State, err?: any, body?: any) {

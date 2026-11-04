@@ -32,12 +32,8 @@ import {
   AuthorizationActions,
   Sections,
 } from '@gitroom/backend/services/auth/permissions/permission.exception.class';
-import { VideoDto } from '@gitroom/nestjs-libraries/dtos/videos/video.dto';
-import { VideoFunctionDto } from '@gitroom/nestjs-libraries/dtos/videos/video.function.dto';
 import { UploadDto } from '@gitroom/nestjs-libraries/dtos/media/upload.dto';
 import { GetMediaDto } from '@gitroom/nestjs-libraries/dtos/media/get.media.dto';
-import { ClippingDto } from '@gitroom/nestjs-libraries/dtos/clipping/clipping.dto';
-import { ClippingService } from '@gitroom/nestjs-libraries/database/prisma/clipping/clipping.service';
 import { NotificationService } from '@gitroom/nestjs-libraries/database/prisma/notifications/notification.service';
 import { GetNotificationsDto } from '@gitroom/nestjs-libraries/dtos/notifications/get.notifications.dto';
 import * as Sentry from '@sentry/nestjs';
@@ -73,7 +69,6 @@ export class PublicIntegrationsController {
     private _usersService: UsersService,
     private _adminStatsService: AdminStatsService,
     private _organizationService: OrganizationService,
-    private _clippingService: ClippingService,
     private _subscriptionService: SubscriptionService
   ) {}
 
@@ -498,49 +493,6 @@ export class PublicIntegrationsController {
       org.id,
       query.page ?? 0
     );
-  }
-
-  @Post('/generate-video')
-  generateVideo(
-    @GetOrgFromRequest() org: Organization,
-    @Body() body: VideoDto
-  ) {
-    Sentry.metrics.count('public_api-request', 1);
-    return this._mediaService.generateVideo(org, body);
-  }
-
-  @Post('/video/function')
-  videoFunction(@Body() body: VideoFunctionDto) {
-    Sentry.metrics.count('public_api-request', 1);
-    return this._mediaService.videoFunction(
-      body.identifier,
-      body.functionName,
-      body.params
-    );
-  }
-
-  @Post('/clipping')
-  startClipping(
-    @GetOrgFromRequest() org: Organization,
-    @Body() body: ClippingDto
-  ) {
-    Sentry.metrics.count('public_api-request', 1);
-    return this._clippingService.startClipping(org, body);
-  }
-
-  @Get('/clipping')
-  getClippings(
-    @GetOrgFromRequest() org: Organization,
-    @Query('page') page: number
-  ) {
-    Sentry.metrics.count('public_api-request', 1);
-    return this._clippingService.getClippings(org.id, page);
-  }
-
-  @Get('/clipping/:id')
-  getClipping(@GetOrgFromRequest() org: Organization, @Param('id') id: string) {
-    Sentry.metrics.count('public_api-request', 1);
-    return this._clippingService.getClipping(org.id, id);
   }
 
   @Delete('/integrations/:id')

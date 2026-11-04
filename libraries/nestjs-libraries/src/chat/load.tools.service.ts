@@ -75,9 +75,6 @@ export class LoadToolsService {
         - List the posts scheduled between two dates (postsListTool)
         - Update the settings of a scheduled post or draft that was not published yet (postSettingsTool)
         - Delete a post (deletePostTool)
-        - Generate pictures for posts
-        - Generate videos for posts
-        - Generate text for posts
         - Show global analytics about socials
         - List integrations (channels)
         - List groups (customers) and filter the channels by a group

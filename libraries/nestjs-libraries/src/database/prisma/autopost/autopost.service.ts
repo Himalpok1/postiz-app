@@ -6,10 +6,6 @@ import { END, START, StateGraph } from '@langchain/langgraph';
 import { AutoPost, Integration } from '@prisma/client';
 import { BaseMessage } from '@langchain/core/messages';
 import striptags from 'striptags';
-import { ChatOpenAI, DallEAPIWrapper } from '@langchain/openai';
-import { JSDOM } from 'jsdom';
-import { z } from 'zod';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { PostsService } from '@gitroom/nestjs-libraries/database/prisma/posts/posts.service';
 import Parser from 'rss-parser';
 import { IntegrationService } from '@gitroom/nestjs-libraries/database/prisma/integrations/integration.service';
@@ -34,29 +30,6 @@ interface WorkflowChannelsState {
     description: string;
   };
 }
-
-const model = new ChatOpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'sk-proj-',
-  model: 'gpt-4.1',
-  temperature: 0.7,
-});
-
-const dalle = new DallEAPIWrapper({
-  apiKey: process.env.OPENAI_API_KEY || 'sk-proj-',
-  model: 'chatgpt-image-latest',
-});
-
-const generateContent = z.object({
-  socialMediaPostContent: z
-    .string()
-    .describe('Content for social media posts max 120 chars'),
-});
-
-const dallePrompt = z.object({
-  generatedTextToBeSentToDallE: z
-    .string()
-    .describe('Generated prompt from description to be sent to DallE'),
-});
 
 @Injectable()
 export class AutopostService {
@@ -187,84 +160,12 @@ export class AutopostService {
       },
     });
 
-  async loadUrl(url: string) {
-    try {
-      const loadDom = new JSDOM(await (await fetch(url)).text());
-      loadDom.window.document
-        .querySelectorAll('script')
-        .forEach((s) => s.remove());
-      loadDom.window.document
-        .querySelectorAll('style')
-        .forEach((s) => s.remove());
-      // remove all html, script and styles
-      return striptags(loadDom.window.document.body.innerHTML);
-    } catch (err) {
-      return '';
-    }
-  }
-
   async generateDescription(state: WorkflowChannelsState) {
-    if (!state.body.generateContent) {
-      return {
-        ...state,
-        description: state.body.content,
-      };
-    }
-
-    const description =
-      state.load.description || (await this.loadUrl(state.load.url));
-    if (!description) {
-      return {
-        ...state,
-        description: '',
-      };
-    }
-
-    const structuredOutput = model.withStructuredOutput(generateContent);
-    const { socialMediaPostContent } = await ChatPromptTemplate.fromTemplate(
-      `
-        You are an assistant that gets raw 'description' of a content and generate a social media post content.
-        Rules:
-        - Maximum 100 chars
-        - Try to make it a short as possible to fit any social media
-        - Add line breaks between sentences (\\n) 
-        - Don't add hashtags
-        - Add emojis when needed
-        
-        'description':
-        {content}
-      `
-    )
-      .pipe(structuredOutput)
-      .invoke({
-        content: description,
-      });
-
     return {
       ...state,
-      description: socialMediaPostContent,
+      // No custom text set: post the feed item's own description instead
+      description: state.body.content || state.load.description || '',
     };
-  }
-
-  async generatePicture(state: WorkflowChannelsState) {
-    const structuredOutput = model.withStructuredOutput(dallePrompt);
-    const { generatedTextToBeSentToDallE } =
-      await ChatPromptTemplate.fromTemplate(
-        `
-        You are an assistant that gets description and generate a prompt that will be sent to DallE to generate pictures.
-        
-        content:
-        {content}
-      `
-      )
-        .pipe(structuredOutput)
-        .invoke({
-          content: state.load.description || state.description,
-        });
-
-    const image = await dalle.invoke(generatedTextToBeSentToDallE);
-
-    return { ...state, image };
   }
 
   async schedulePost(state: WorkflowChannelsState) {
@@ -291,10 +192,12 @@ export class AutopostService {
           {
             id: makeId(10),
             delay: 0,
-            content:
-              state.description.replace(/\n/g, '\n\n') +
-              '\n\n' +
+            content: [
+              state.description.replace(/\n/g, '\n\n'),
               state.load.url,
+            ]
+              .filter((text) => text)
+              .join('\n\n'),
             image: !state.image
               ? []
               : [
@@ -344,23 +247,10 @@ export class AutopostService {
     const state = AutopostService.state();
     const workflow = state
       .addNode('generate-description', this.generateDescription.bind(this))
-      .addNode('generate-picture', this.generatePicture.bind(this))
       .addNode('schedule-post', this.schedulePost.bind(this))
       .addNode('update-url', this.updateUrl.bind(this))
       .addEdge(START, 'generate-description')
-      .addConditionalEdges(
-        'generate-description',
-        (state: WorkflowChannelsState) => {
-          if (!state.description) {
-            return 'schedule-post';
-          }
-          if (state.body.addPicture) {
-            return 'generate-picture';
-          }
-          return 'schedule-post';
-        }
-      )
-      .addEdge('generate-picture', 'schedule-post')
+      .addEdge('generate-description', 'schedule-post')
       .addEdge('schedule-post', 'update-url')
       .addEdge('update-url', END);
 

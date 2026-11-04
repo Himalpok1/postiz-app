@@ -143,7 +143,6 @@ export const startMcp = async (app: INestApplication) => {
     name: 'Postiz MCP',
     version: '1.0.0',
     tools,
-    agents: { postiz: agent },
     appResources,
   };
 
