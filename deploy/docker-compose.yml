@@ -1,5 +1,5 @@
-# Castrapid production stack. It runs anywhere Docker runs: move this repo's
-# deploy/ and site/ folders plus the named volumes to change server.
+# Castrapid production stack. It runs anywhere Docker runs. To change server,
+# see the steps in README.md.
 # Start it with: docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d
 name: castrapid
 

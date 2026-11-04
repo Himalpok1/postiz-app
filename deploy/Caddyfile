@@ -1,4 +1,5 @@
 # TLS is handled in front of this (a tunnel or a server proxy), so it listens on plain HTTP.
+# Rate limits use the client address, so whatever sits in front must be set as a trusted proxy.
 :80 {
 	encode gzip
 
@@ -9,8 +10,10 @@
 	}
 
 	# Signed-out visitors get the home page at the root. Signed-in people go to the app.
+	# Links with a query, such as team invites (/?org=...), go to the app.
 	@home {
 		path /
+		expression `{http.request.uri.query} == ""`
 		not header_regexp Cookie (^|;\s*)auth=
 	}
 	handle @home {
