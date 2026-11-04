@@ -284,7 +284,7 @@
     },
     {
       "description": "Upload two remote images and create a LinkedIn draft (nothing is published).",
-      "user_prompt": "Create a LinkedIn draft in Postiz for next Monday at 10:00 UTC with the text \"Testing the Postiz ChatGPT app\" and attach these two images: https://platform.postiz.com/auth/bg-login.png and https://platform.postiz.com/auth/login-box.png. Keep it as a draft, do not schedule or publish it.",
+      "user_prompt": "Create a LinkedIn draft in Postiz for next Monday at 10:00 UTC with the text \"Testing the Postiz ChatGPT app\" and attach these two images: https://castrapid.com/auth/bg-login.png and https://castrapid.com/auth/login-box.png. Keep it as a draft, do not schedule or publish it.",
       "file_attachment_urls": null,
       "tools_triggered": "integrationList, uploadFromUrlTool, integrationSchedulePostTool",
       "expected_output": "Finds the LinkedIn channel, calls uploadFromUrlTool once per image (each returns a hosted media path), then calls integrationSchedulePostTool with type \"draft\" and both hosted attachments. Returns the new post id and confirms it was saved as a draft. Nothing is published to LinkedIn. Running the case again creates another draft and succeeds the same way.",

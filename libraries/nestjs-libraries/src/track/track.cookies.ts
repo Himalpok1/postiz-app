@@ -17,8 +17,8 @@ const cookieOptions = (expiresInDays: number, httpOnly: boolean) => ({
   expires: new Date(Date.now() + DAY * expiresInDays),
 });
 
-// Sets the visitor cookies on the root domain, so postiz.com and
-// platform.postiz.com share them, and returns the ids for the Conversions API.
+// Sets the visitor cookies on the root domain, so castrapid.com and
+// its app subdomain share them, and returns the ids for the Conversions API.
 //
 // _fbc / _fbp are written by the server in Meta's own format instead of
 // waiting for the pixel: when an adblocker kills the pixel nothing else would

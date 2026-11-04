@@ -42,11 +42,6 @@
 - `README.md` — General project overview
 - `libraries/nestjs-libraries/src/database/prisma/schema.prisma` — Database schema
 
-## Documentation
-- Main docs: https://docs.postiz.com/
-- Developer guide: https://docs.postiz.com/developer-guide
-- Public API: https://docs.postiz.com/public-api
-
 ---
 
 # Logs

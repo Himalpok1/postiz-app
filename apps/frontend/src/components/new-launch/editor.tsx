@@ -15,6 +15,7 @@ import clsx from 'clsx';
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import EmojiPicker from 'emoji-picker-react';
 import { Theme } from 'emoji-picker-react';
+import useCookie from 'react-use-cookie';
 import { BoldText } from '@gitroom/frontend/components/new-launch/bold.text';
 import { UText } from '@gitroom/frontend/components/new-launch/u.text';
 import { SignatureBox } from '@gitroom/frontend/components/signature';
@@ -633,6 +634,7 @@ export const Editor: FC<{
   chars: Record<string, number>;
   childButton?: React.ReactNode;
 }> = (props) => {
+  const [mode] = useCookie('mode', 'light');
   const {
     flat,
     active,
@@ -1099,10 +1101,7 @@ export const Editor: FC<{
                           >
                             <EmojiPicker
                               height={400}
-                              theme={
-                                (localStorage.getItem('mode') as Theme) ||
-                                Theme.DARK
-                              }
+                              theme={mode as Theme}
                               onEmojiClick={(e) => {
                                 addText(e.emoji);
                                 setEmojiPickerOpen(false);
