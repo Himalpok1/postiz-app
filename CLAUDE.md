@@ -28,6 +28,17 @@ All the --color-custom* are deprecated, don't use them.
 
 And check other components in the system before to get the right design.
 
+## UI design: always use the Hallmark skill
+
+Our UI must not look like upstream Postiz; the design is part of how we attract customers. Hallmark is installed at `.claude/skills/hallmark`.
+
+- Invoke the `hallmark` skill before any work that makes a visual or layout decision: new pages, screens and components, redesigns, restyles, and any request to change how something looks. This instruction counts as the user naming Hallmark, so the skill's "never on an existing design unless named" limit does not apply here. Requests to change an existing design use its `redesign` verb.
+- Skip it for work with no design decision: logic bugs, data fetching, copy changes, or a change that only applies the locked system.
+- The product has one visual system. If `design.md` is missing at the root, the first Hallmark run proposes the direction, and once the user approves it, locks it into `design.md`. After that every run follows `design.md`; do not deal a new theme per screen.
+- The current colors, fonts and layouts are inherited from Postiz. They are not our brand, so Hallmark must not preserve them as one. Keep the logic and wiring of existing components, and take the visual design from `design.md`.
+- Screens behind a login use Hallmark's app screen scope (`--scope app`); marketing pages use its page rules.
+- The rules in this file still bind: Tailwind 3, no `--color-custom*`, native components only, SWR hooks, no breaking changes for existing users. Put new tokens in the files listed above so they work with the existing theme setup.
+
 When working on the backend we need to pass the 3 layers:
 DTO >> Controller >> Service >> Repository (no shortcuts)
 In some cases we will have
