@@ -1,0 +1,25 @@
+# TLS is handled in front of this (a tunnel or a server proxy), so it listens on plain HTTP.
+:80 {
+	encode gzip
+
+	@site path /terms /terms/* /privacy /privacy/* /img/calendar.jpg
+	handle @site {
+		root * /srv/site
+		file_server
+	}
+
+	# Signed-out visitors get the home page at the root. Signed-in people go to the app.
+	@home {
+		path /
+		not header_regexp Cookie (^|;\s*)auth=
+	}
+	handle @home {
+		root * /srv/site
+		rewrite * /index.html
+		file_server
+	}
+
+	handle {
+		reverse_proxy castrapid:5000
+	}
+}
