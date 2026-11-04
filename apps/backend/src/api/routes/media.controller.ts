@@ -20,68 +20,20 @@ import { ApiTags } from '@nestjs/swagger';
 import handleR2Upload from '@gitroom/nestjs-libraries/upload/r2.uploader';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { streamUploadOptions } from '@gitroom/nestjs-libraries/upload/multer.stream.engine';
-import { SubscriptionService } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/subscription.service';
 import { UploadFactory } from '@gitroom/nestjs-libraries/upload/upload.factory';
 import { SaveMediaInformationDto } from '@gitroom/nestjs-libraries/dtos/media/save.media.information.dto';
-import { VideoDto } from '@gitroom/nestjs-libraries/dtos/videos/video.dto';
-import { VideoFunctionDto } from '@gitroom/nestjs-libraries/dtos/videos/video.function.dto';
 
 @ApiTags('Media')
 @Controller('/media')
 export class MediaController {
   private storage = UploadFactory.createStorage();
   constructor(
-    private _mediaService: MediaService,
-    private _subscriptionService: SubscriptionService
+    private _mediaService: MediaService
   ) {}
 
   @Delete('/:id')
   deleteMedia(@GetOrgFromRequest() org: Organization, @Param('id') id: string) {
     return this._mediaService.deleteMedia(org.id, id);
-  }
-
-  @Post('/generate-video')
-  generateVideo(
-    @GetOrgFromRequest() org: Organization,
-    @Body() body: VideoDto
-  ) {
-    console.log('hello');
-    return this._mediaService.generateVideo(org, body);
-  }
-
-  @Post('/generate-image')
-  async generateImage(
-    @GetOrgFromRequest() org: Organization,
-    @Req() req: Request,
-    @Body('prompt') prompt: string,
-    isPicturePrompt = false
-  ) {
-    const total = await this._subscriptionService.checkCredits(org);
-    if (process.env.STRIPE_PUBLISHABLE_KEY && total.credits <= 0) {
-      return false;
-    }
-
-    return {
-      output:
-        'data:image/png;base64,' +
-        (await this._mediaService.generateImage(prompt, org, isPicturePrompt)),
-    };
-  }
-
-  @Post('/generate-image-with-prompt')
-  async generateImageFromText(
-    @GetOrgFromRequest() org: Organization,
-    @Req() req: Request,
-    @Body('prompt') prompt: string
-  ) {
-    const image = await this.generateImage(org, req, prompt, true);
-    if (!image) {
-      return false;
-    }
-
-    const file = await this.storage.uploadSimple(image.output);
-
-    return this._mediaService.saveFile(org.id, file.split('/').pop(), file);
   }
 
   @Post('/upload-server')
@@ -208,23 +160,4 @@ export class MediaController {
     return this._mediaService.getMedia(org.id, page, search);
   }
 
-  @Get('/video-options')
-  getVideos() {
-    return this._mediaService.getVideoOptions();
-  }
-
-  @Post('/video/function')
-  videoFunction(
-    @Body() body: VideoFunctionDto
-  ) {
-    return this._mediaService.videoFunction(body.identifier, body.functionName, body.params);
-  }
-
-  @Get('/generate-video/:type/allowed')
-  generateVideoAllowed(
-    @GetOrgFromRequest() org: Organization,
-    @Param('type') type: string
-  ) {
-    return this._mediaService.generateVideoAllowed(org, type);
-  }
 }

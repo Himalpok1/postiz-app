@@ -14,7 +14,6 @@ import { PickPlatforms } from '@gitroom/frontend/components/launches/helpers/pic
 import { useToaster } from '@gitroom/react/toaster/toaster';
 import clsx from 'clsx';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
-import { CopilotTextarea } from '@copilotkit/react-textarea';
 import { Slider } from '@gitroom/react/form/slider';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 export const Autopost: FC = () => {
@@ -29,7 +28,9 @@ export const Autopost: FC = () => {
   const addWebhook = useCallback(
     (data?: any) => () => {
       modal.openModal({
-        title: data ? t('edit_autopost', 'Edit Autopost') : t('add_autopost_title', 'Add Autopost'),
+        title: data
+          ? t('edit_autopost', 'Edit Autopost')
+          : t('add_autopost_title', 'Add Autopost'),
         withCloseButton: true,
         children: <AddOrEditWebhook data={data} reload={mutate} />,
       });
@@ -51,7 +52,10 @@ export const Autopost: FC = () => {
           method: 'DELETE',
         });
         mutate();
-        toaster.show(t('webhook_deleted_successfully', 'Webhook deleted successfully'), 'success');
+        toaster.show(
+          t('webhook_deleted_successfully', 'Webhook deleted successfully'),
+          'success'
+        );
       }
     },
     []
@@ -191,15 +195,11 @@ export const AddOrEditWebhook: FC<{
       url: data?.url || '',
       // eslint-disable-next-line no-prototype-builtins
       active: data?.hasOwnProperty?.('active') ? data?.active : true,
-      addPicture: data?.addPicture || false,
-      // eslint-disable-next-line no-prototype-builtins
-      generateContent: data?.hasOwnProperty?.('generateContent')
-        ? data?.generateContent
-        : true,
+      addPicture: false,
+      generateContent: false,
       integrations: JSON.parse(data?.integrations || '[]') || [],
     },
   });
-  const generateContent = form.watch('generateContent');
   const content = form.watch('content');
   const url = form.watch('url');
   const syncLast = form.watch('syncLast');
@@ -271,7 +271,10 @@ export const AddOrEditWebhook: FC<{
       ).json();
       if (!success) {
         setValid('');
-        toast.show(t('could_not_use_rss_feed', 'Could not use this RSS feed'), 'warning');
+        toast.show(
+          t('could_not_use_rss_feed', 'Could not use this RSS feed'),
+          'warning'
+        );
         return;
       }
       toast.show(t('rss_valid', 'RSS valid!'), 'success');
@@ -312,54 +315,24 @@ export const AddOrEditWebhook: FC<{
                 </option>
               ))}
             </Select>
-            <Select
-              label="Autogenerate content"
-              translationKey="label_autogenerate_content"
-              {...form.register('generateContent', {
-                setValueAs: (value) => value === 'true' || value === true,
-              })}
-            >
-              {optionsChoose.map((option) => (
-                <option key={String(option.value)} value={String(option.value)}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
-            {!generateContent && (
-              <>
-                <div className={`text-[14px] mb-[6px]`}>
-                  {t('post_content', 'Post content')}
-                </div>
-                <CopilotTextarea
-                  disableBranding={true}
-                  className={clsx(
-                    '!min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[#612AD5] bg-customColor2 outline-none mb-[16px] border-fifth border rounded-[4px]'
-                  )}
-                  value={content}
-                  onChange={(e) => {
-                    form.setValue('content', e.target.value);
-                  }}
-                  placeholder={t('write_your_post_placeholder', 'Write your post...')}
-                  autosuggestionsConfig={{
-                    textareaPurpose: `Assist me in writing social media post`,
-                    chatApiConfigs: {},
-                  }}
-                />
-              </>
-            )}
-            <Select
-              label="Generate Picture?"
-              translationKey="label_generate_picture"
-              {...form.register('addPicture', {
-                setValueAs: (value) => value === 'true' || value === true,
-              })}
-            >
-              {optionsChoose.map((option) => (
-                <option key={String(option.value)} value={String(option.value)}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
+            <>
+              <div className={`text-[14px] mb-[6px]`}>
+                {t('post_content', 'Post content')}
+              </div>
+              <textarea
+                className={clsx(
+                  'w-full !min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[#612AD5] bg-customColor2 outline-none mb-[16px] border-fifth border rounded-[4px]'
+                )}
+                value={content}
+                onChange={(e) => {
+                  form.setValue('content', e.target.value);
+                }}
+                placeholder={t(
+                  'write_your_post_placeholder',
+                  'Write your post...'
+                )}
+              />
+            </>
             <Select
               value={allIntegrations.value}
               name="integrations"

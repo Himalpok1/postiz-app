@@ -75,36 +75,6 @@ export const Prorate: FC<{
   );
 };
 
-const creditTypes = ['ai_images', 'ai_videos', 'clipping_minutes'] as const;
-
-const useLoadCredits = () => {
-  const fetch = useFetch();
-  return useCallback(
-    async (
-      type: (typeof creditTypes)[number]
-    ): Promise<{ credits: number }> => {
-      const response = await fetch(`/copilot/credits?type=${type}`);
-      if (!response.ok) {
-        throw new Error('Failed to load credits');
-      }
-      return response.json();
-    },
-    []
-  );
-};
-
-const useCredits = (type: (typeof creditTypes)[number]) => {
-  const loadCredits = useLoadCredits();
-  return useSWR<{ credits: number }>(
-    `/copilot/credits?type=${type}`,
-    () => loadCredits(type),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
-};
-
 const useRenewal = () => {
   const fetch = useFetch();
   return useSWR<{ renewsAt: number | null; trialing: boolean }>(
@@ -127,30 +97,9 @@ const BillingCycle: FC<{
   tier: string;
   canceled: boolean;
 }> = (props) => {
-  const { tier, canceled } = props;
+  const { canceled } = props;
   const t = useT();
   const { data: renewal } = useRenewal();
-  const { data: images } = useCredits('ai_images');
-  const { data: videos } = useCredits('ai_videos');
-  const { data: clipping } = useCredits('clipping_minutes');
-
-  const usage = [
-    {
-      label: t('billing_ai_images', 'AI images'),
-      total: pricing[tier]?.image_generation_count,
-      left: images?.credits,
-    },
-    {
-      label: t('billing_ai_videos', 'AI videos'),
-      total: pricing[tier]?.generate_videos,
-      left: videos?.credits,
-    },
-    {
-      label: t('billing_clipping_minutes', 'Clipping minutes'),
-      total: pricing[tier]?.clipping_minutes,
-      left: clipping?.credits,
-    },
-  ].filter((p) => p.total);
 
   return (
     <div className="flex items-center gap-[16px] rounded-[12px] border border-newTableBorder bg-newBgColorInner shadow-previewShadow px-[24px] py-[20px] mobile:flex-col mobile:items-stretch mobile:p-[16px]">
@@ -189,28 +138,7 @@ const BillingCycle: FC<{
               {'. '}
             </>
           )}
-          {t(
-            'billing_ai_credits_reset_monthly',
-            'AI credits reset every month.'
-          )}
         </div>
-      </div>
-      <div className="flex gap-[8px] mobile:flex-col">
-        {usage.map((p) => (
-          <div
-            key={p.label}
-            className="flex flex-col gap-[2px] min-w-[120px] rounded-[8px] border border-newTableBorder px-[16px] py-[10px]"
-          >
-            <div className="text-[12px] text-textItemBlur">{p.label}</div>
-            <div className="text-[16px] font-[600]">
-              {typeof p.left === 'number' ? Math.max(p.left, 0) : '-'}
-              <span className="text-[14px] font-[400] text-textItemBlur">
-                {' / '}
-                {p.total}
-              </span>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -520,9 +448,7 @@ export const MainBillingComponent: FC<{
     }
     setSubscription(sub);
   }, [sub]);
-  const loadCredits = useLoadCredits();
-  // credits follow the plan stored by the Stripe webhook: wait for it, then
-  // show the new plan's totals and credits together
+  // the plan is stored by the Stripe webhook: wait for it before showing it
   const showConfirmedPlan = useCallback(
     async (billing: string, period: string, attempt = 0) => {
       try {
@@ -537,12 +463,6 @@ export const MainBillingComponent: FC<{
           }
           return;
         }
-        const credits = await Promise.all(creditTypes.map(loadCredits));
-        creditTypes.forEach((type, index) =>
-          mutate(`/copilot/credits?type=${type}`, credits[index], {
-            revalidate: false,
-          })
-        );
         mutate('/user/subscription', current, { revalidate: false });
       } catch (err) {}
     },

@@ -24,14 +24,23 @@ import {
   useLaunchStore,
 } from '@gitroom/frontend/components/new-launch/store';
 import { useShallow } from 'zustand/react/shallow';
-import { AddPostButton } from '@gitroom/frontend/components/new-launch/add.post.button';
-import { MultiMediaComponent } from '@gitroom/frontend/components/media/media.component';
-import { UpDownArrow } from '@gitroom/frontend/components/launches/up.down.arrow';
+import {
+  AddPostButton,
+} from '@gitroom/frontend/components/new-launch/add.post.button';
+import {
+  MultiMediaComponent,
+} from '@gitroom/frontend/components/media/media.component';
+import {
+  UpDownArrow,
+} from '@gitroom/frontend/components/launches/up.down.arrow';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
-import { useExistingData } from '@gitroom/frontend/components/launches/helpers/use.existing.data';
-import { useCopilotAction, useCopilotReadable } from '@copilotkit/react-core';
+import {
+  useExistingData,
+} from '@gitroom/frontend/components/launches/helpers/use.existing.data';
 import { useDropzone } from 'react-dropzone';
-import { useUppyUploader } from '@gitroom/frontend/components/media/new.uploader';
+import {
+  useUppyUploader,
+} from '@gitroom/frontend/components/media/new.uploader';
 import { Dashboard } from '@uppy/react';
 import Link from '@tiptap/extension-link';
 import {
@@ -46,29 +55,42 @@ import Bold from '@tiptap/extension-bold';
 import Text from '@tiptap/extension-text';
 import Paragraph from '@tiptap/extension-paragraph';
 import Underline from '@tiptap/extension-underline';
-import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
+import {
+  stripHtmlValidation,
+} from '@gitroom/helpers/utils/strip.html.validation';
 import { History } from '@tiptap/extension-history';
 import { BulletList, ListItem } from '@tiptap/extension-list';
-import { Bullets } from '@gitroom/frontend/components/new-launch/bullets.component';
+import {
+  Bullets,
+} from '@gitroom/frontend/components/new-launch/bullets.component';
 import Heading from '@tiptap/extension-heading';
 import { Fragment, Slice } from '@tiptap/pm/model';
-import { HeadingComponent } from '@gitroom/frontend/components/new-launch/heading.component';
+import {
+  HeadingComponent,
+} from '@gitroom/frontend/components/new-launch/heading.component';
 import Mention from '@tiptap/extension-mention';
-import { suggestion } from '@gitroom/frontend/components/new-launch/mention.component';
+import {
+  suggestion,
+} from '@gitroom/frontend/components/new-launch/mention.component';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
-import { AComponent } from '@gitroom/frontend/components/new-launch/a.component';
+import {
+  AComponent,
+} from '@gitroom/frontend/components/new-launch/a.component';
 import { Dropcursor, Placeholder, TrailingNode } from '@tiptap/extensions';
 import { useToaster } from '@gitroom/react/toaster/toaster';
-import { InformationComponent } from '@gitroom/frontend/components/launches/information.component';
+import {
+  InformationComponent,
+} from '@gitroom/frontend/components/launches/information.component';
 import {
   LockIcon,
   ConnectionLineIcon,
   ResetIcon,
   TrashIcon,
   EmojiIcon,
-  DelayIcon,
 } from '@gitroom/frontend/components/ui/icons';
-import { DelayComponent } from '@gitroom/frontend/components/new-launch/delay.component';
+import {
+  DelayComponent,
+} from '@gitroom/frontend/components/new-launch/delay.component';
 
 const MAX_UPLOAD_SIZE = 1024 * 1024 * 1024; // 1 GB
 
@@ -268,26 +290,6 @@ export const EditorWrapper: FC<{
     },
     [internal, items]
   );
-
-  useCopilotReadable({
-    description: 'Current content of posts',
-    value: items.map((p) => p.content),
-  });
-
-  useCopilotAction({
-    name: 'setPosts',
-    description: 'a thread of posts',
-    parameters: [
-      {
-        name: 'content',
-        type: 'string[]',
-        description: 'a thread of posts',
-      },
-    ],
-    handler: async ({ content }) => {
-      setValue(content);
-    },
-  });
 
   const changeValue = useCallback(
     (index: number) => (value: string) => {

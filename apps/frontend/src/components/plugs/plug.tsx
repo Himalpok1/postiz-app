@@ -10,7 +10,6 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import useSWR, { mutate } from 'swr';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
-import { TopTitle } from '@gitroom/frontend/components/launches/helpers/top.title.component';
 import {
   FormProvider,
   SubmitHandler,
@@ -18,14 +17,12 @@ import {
   useFormContext,
 } from 'react-hook-form';
 import { Input } from '@gitroom/react/form/input';
-import { CopilotTextarea } from '@copilotkit/react-textarea';
 import clsx from 'clsx';
 import { string, object } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Slider } from '@gitroom/react/form/slider';
 import { useToaster } from '@gitroom/react/toaster/toaster';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
-import { ModalWrapperComponent } from '@gitroom/frontend/components/new-launch/modal.wrapper.component';
 export function convertBackRegex(s: string) {
   const matches = s.match(/\/(.*)\/([a-z]*)/);
   const pattern = matches?.[1] || '';
@@ -42,12 +39,11 @@ export const TextArea: FC<{
   return (
     <>
       <textarea className="hidden" {...all}></textarea>
-      <CopilotTextarea
-        disableBranding={true}
+      <textarea
         placeholder={props.placeHolder}
         value={value}
         className={clsx(
-          '!min-h-40 !max-h-80 p-[24px] overflow-hidden bg-customColor2 outline-none rounded-[4px] border-fifth border'
+          'w-full !min-h-40 !max-h-80 p-[24px] overflow-y-auto bg-customColor2 outline-none rounded-[4px] border-fifth border'
         )}
         onChange={(e) => {
           onChange({
@@ -56,10 +52,6 @@ export const TextArea: FC<{
               value: e.target.value,
             },
           });
-        }}
-        autosuggestionsConfig={{
-          textareaPurpose: `Assist me in writing social media posts.`,
-          chatApiConfigs: {},
         }}
       />
       <div className="text-red-400 text-[12px]">

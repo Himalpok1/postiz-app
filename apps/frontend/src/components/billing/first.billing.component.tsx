@@ -16,10 +16,7 @@ import { capitalize } from 'lodash';
 import clsx from 'clsx';
 import { LoadingComponent } from '@gitroom/frontend/components/layout/loading';
 import { CheckIconComponent } from '@gitroom/frontend/components/ui/check.icon.component';
-import {
-  FAQComponent,
-  FAQSection,
-} from '@gitroom/frontend/components/billing/faq.component';
+import { FAQComponent } from '@gitroom/frontend/components/billing/faq.component';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { useDubClickId } from '@gitroom/frontend/components/layout/dubAnalytics';
@@ -379,10 +376,6 @@ export const useBillingFeatures = (tier: string) => {
         defaultValue: 'AI Autocomplete',
       });
     }
-    list.push({
-      key: 'billing_advanced_picture_editor',
-      defaultValue: 'Advanced Picture Editor',
-    });
     if (currentPricing?.image_generator) {
       list.push({
         key: 'billing_ai_images_per_month',
