@@ -3,7 +3,7 @@
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import clsx from 'clsx';
-import { capitalize } from 'lodash';
+import { planDisplayName } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { Select } from '@gitroom/react/form/select';
@@ -114,7 +114,7 @@ export const BillingHistory: FC<{ modal?: boolean }> = ({ modal }) => {
         .map((invoice) => ({
           ...invoice,
           plan: invoice.tier
-            ? capitalize(invoice.tier)
+            ? planDisplayName[invoice.tier] || invoice.tier
             : invoice.description || t('billing_subscription', 'Subscription'),
           periodLabel:
             invoice.period === 'YEARLY'

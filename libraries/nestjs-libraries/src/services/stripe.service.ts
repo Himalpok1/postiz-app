@@ -6,7 +6,10 @@ import { OrganizationService } from '@gitroom/nestjs-libraries/database/prisma/o
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import { BillingSubscribeDto } from '@gitroom/nestjs-libraries/dtos/billing/billing.subscribe.dto';
 import { groupBy } from 'lodash';
-import { pricing } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
+import {
+  planDisplayName,
+  pricing,
+} from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
 import { AuthService } from '@gitroom/helpers/auth/auth.service';
 import { TrackService } from '@gitroom/nestjs-libraries/track/track.service';
 import { UsersService } from '@gitroom/nestjs-libraries/database/prisma/users/users.service';
@@ -363,11 +366,13 @@ export class StripeService extends PaymentProviderAbstract {
 
     const findProduct =
       allProducts.data.find(
-        (product) => product.name.toUpperCase() === body.billing.toUpperCase()
+        (product) =>
+          product.name.toUpperCase() === body.billing.toUpperCase() ||
+          product.name === planDisplayName[body.billing]
       ) ||
       (await stripe.products.create({
         active: true,
-        name: body.billing,
+        name: planDisplayName[body.billing] || body.billing,
       }));
 
     const pricesList = await stripe.prices.list({
@@ -998,11 +1003,13 @@ export class StripeService extends PaymentProviderAbstract {
 
     const findProduct =
       allProducts.data.find(
-        (product) => product.name.toUpperCase() === body.billing.toUpperCase()
+        (product) =>
+          product.name.toUpperCase() === body.billing.toUpperCase() ||
+          product.name === planDisplayName[body.billing]
       ) ||
       (await stripe.products.create({
         active: true,
-        name: body.billing,
+        name: planDisplayName[body.billing] || body.billing,
       }));
 
     const pricesList = await stripe.prices.list({
@@ -1064,11 +1071,13 @@ export class StripeService extends PaymentProviderAbstract {
 
     const findProduct =
       allProducts.data.find(
-        (product) => product.name.toUpperCase() === body.billing.toUpperCase()
+        (product) =>
+          product.name.toUpperCase() === body.billing.toUpperCase() ||
+          product.name === planDisplayName[body.billing]
       ) ||
       (await stripe.products.create({
         active: true,
-        name: body.billing,
+        name: planDisplayName[body.billing] || body.billing,
       }));
 
     const pricesList = await stripe.prices.list({

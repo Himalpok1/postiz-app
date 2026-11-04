@@ -117,10 +117,6 @@ module.exports = {
       gridTemplateColumns: {
         13: 'repeat(13, minmax(0, 1fr));',
       },
-      backgroundImage: {
-        loginBox: 'url(/auth/login-box.png)',
-        loginBg: 'url(/auth/bg-login.png)',
-      },
       fontFamily: {
         sans: ['Helvetica Neue'],
       },

@@ -1,4 +1,4 @@
-# Postiz NodeJS SDK
+# Castrapid NodeJS SDK
 
 This is the NodeJS SDK for [Castrapid](https://castrapid.com).
 
@@ -10,13 +10,13 @@ npm install @castrapid/node
 
 ## Usage
 ```typescript
-import Postiz from '@castrapid/node';
-const postiz = new Postiz('your api key', 'your self-hosted instance (optional)');
+import Castrapid from '@castrapid/node';
+const castrapid = new Castrapid('your api key', 'your self-hosted instance (optional)');
 ```
 
 The available methods are:
-- `post(posts: CreatePostDto)` - Schedule a post to Postiz
+- `post(posts: CreatePostDto)` - Schedule a post to Castrapid
 - `postList(filters: GetPostsDto)` - Get a list of posts
-- `upload(file: Buffer, extension: string)` - Upload a file to Postiz
+- `upload(file: Buffer, extension: string)` - Upload a file to Castrapid
 - `integrations()` - Get a list of connected channels
 - `deletePost(id: string)` - Delete a post by ID

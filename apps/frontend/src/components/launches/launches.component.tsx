@@ -1,5 +1,6 @@
 'use client';
 
+import { planDisplayName } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
 import {
   AddProviderButton,
   CustomVariables,
@@ -743,7 +744,7 @@ export const LaunchesComponent = () => {
             </div>
             <div className="mt-[5px] text-center flex flex-col mobile:hidden">
               {billingEnabled && user?.isLifetime && (
-                <div>{capitalize(user?.tier?.current || '')} tier</div>
+                <div>{planDisplayName[user?.tier?.current || '']} tier</div>
               )}
               <div>
                 {process.env.NEXT_PUBLIC_VERSION

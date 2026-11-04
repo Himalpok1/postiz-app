@@ -20,6 +20,13 @@ export interface PricingInnerInterface {
 export interface PricingInterface {
   [key: string]: PricingInnerInterface;
 }
+export const planDisplayName: Record<string, string> = {
+  FREE: 'Free',
+  STANDARD: 'Starter',
+  TEAM: 'Team',
+  PRO: 'Pro',
+  ULTIMATE: 'Agency',
+};
 export const pricing: PricingInterface = {
   FREE: {
     current: 'FREE',

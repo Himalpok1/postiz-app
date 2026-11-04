@@ -9,8 +9,10 @@ import ReactLoading from '@gitroom/frontend/components/layout/loading';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
 import { useToaster } from '@gitroom/react/toaster/toaster';
 import clsx from 'clsx';
-import { capitalize } from 'lodash';
-import { pricing } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
+import {
+  planDisplayName,
+  pricing,
+} from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
 import { FAQComponent } from '@gitroom/frontend/components/billing/faq.component';
 import { useBillingFeatures } from '@gitroom/frontend/components/billing/first.billing.component';
 import { BillingHistory } from '@gitroom/frontend/components/billing/billing.history.component';
@@ -200,7 +202,7 @@ const PlanCard: FC<{
         />
       ))}
       <div className="flex items-center justify-between gap-[8px] min-h-[26px]">
-        <div className="text-[18px] font-[600]">{capitalize(name)}</div>
+        <div className="text-[18px] font-[600]">{planDisplayName[name]}</div>
         {current && (
           <div className="flex items-center gap-[6px] h-[26px] px-[10px] rounded-full bg-white/15 text-[12px] font-[600] uppercase whitespace-nowrap">
             <span className="w-[6px] h-[6px] rounded-full bg-[#32D583]" />
