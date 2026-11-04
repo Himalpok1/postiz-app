@@ -16,7 +16,7 @@
 - Run all apps in dev mode: `pnpm run dev`
 - Test: `pnpm test` (Jest, coverage enabled)
 - Individual app scripts are in each app's `package.json` (e.g., `pnpm --filter ./apps/backend run dev`).
-- Prisma DB commands: `pnpm run prisma-generate`, `pnpm run prisma-db-push`, `pnpm run prisma-reset`.
+- Prisma DB commands: `pnpm run prisma-generate`, `pnpm run prisma-migrate-dev`, `pnpm run prisma-migrate-deploy`, `pnpm run prisma-reset`.
 - Docker: `docker compose -f ./docker-compose.dev.yaml up -d`
 
 ## Conventions & Patterns

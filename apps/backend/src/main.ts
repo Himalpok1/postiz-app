@@ -20,7 +20,25 @@ import { HttpExceptionFilter } from '@gitroom/nestjs-libraries/services/exceptio
 import { ConfigurationChecker } from '@gitroom/helpers/configuration/configuration.checker';
 import { startMcp } from '@gitroom/nestjs-libraries/chat/start.mcp';
 
+const assertBillingConfigured = () => {
+  // Without these the app treats every account as fully paid, so never serve
+  // traffic without them. Local development opts out explicitly.
+  const missing = [
+    'STRIPE_PUBLISHABLE_KEY',
+    'STRIPE_SECRET_KEY',
+    'STRIPE_SIGNING_KEY',
+  ].filter((key) => !process.env[key]);
+
+  if (missing.length && process.env.ALLOW_UNBILLED_LOCAL_DEV !== 'true') {
+    Logger.error(
+      `Refusing to start without billing configured: ${missing.join(', ')}`
+    );
+    process.exit(1);
+  }
+};
+
 async function start() {
+  assertBillingConfigured();
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
     cors: {
@@ -67,7 +85,7 @@ async function start() {
     })
   );
 
-  app.use(['/copilot/{*splat}', '/posts'], (req: any, res: any, next: any) => {
+  app.use(['/posts'], (req: any, res: any, next: any) => {
     json({ limit: '50mb' })(req, res, next);
   });
 

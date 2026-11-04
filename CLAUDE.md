@@ -71,6 +71,7 @@ const useCommunity = () => {
 - Linting of the project can run only from the root.
 - Use only pnpm.
 - Never use RAW SQL queries, always use Prisma.
+- Every change to `schema.prisma` needs a migration: run `pnpm run prisma-migrate-dev` and commit the generated folder. Production applies them with `prisma-migrate-deploy`, so never use `prisma-db-push` against a database with real data.
 - The system is in production with many users, if you want to change something, you need to be sure that you are not breaking anything for existing users and a migration might be needed
 - Whenever you generate a PR, PR description, or similar, **always** follow the PR Template (.github/PULL_REQUEST_TEMPLATE.md)
 - Every PR description **must** contain a `# QA` section with real, numbered steps a reviewer can follow to verify the change (setup, action, expected result), written so they can be run without asking the author anything. This is not optional and applies to humans and agents alike, including one-line fixes. The section is extracted verbatim and shown on the review board, so:

@@ -1,6 +1,6 @@
 services:
   postiz:
-    image: ghcr.io/gitroomhq/postiz-app:latest
+    image: ghcr.io/himalpok1/castrapid:latest
     container_name: postiz
     restart: always
     environment:
@@ -94,10 +94,11 @@ services:
       # Only this OAuth client can receive verified user email claims via OIDC.
       OPENAI_OAUTH_CLIENT_ID: ''
       NEXT_PUBLIC_DISCORD_SUPPORT: ''
-      NEXT_PUBLIC_POLOTNO: ''
       API_LIMIT: 30
 
       # === Payment / Stripe Settings
+      # The API refuses to start without these Stripe keys. For local testing only,
+      # set ALLOW_UNBILLED_LOCAL_DEV: 'true' to run without billing.
       FEE_AMOUNT: 0.05
       STRIPE_PUBLISHABLE_KEY: ''
       STRIPE_SECRET_KEY: ''
