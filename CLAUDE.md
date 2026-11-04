@@ -39,6 +39,7 @@ Our UI must not look like upstream Postiz; the design is part of how we attract 
 - Screens behind a login use Hallmark's app screen scope (`--scope app`); marketing pages use its page rules.
 - The rules in this file still bind: Tailwind 3, no `--color-custom*`, native components only, SWR hooks, no breaking changes for existing users. Put new tokens in the files listed above so they work with the existing theme setup.
 - UI UX Pro Max is installed at `.claude/skills/ui-ux-pro-max` as a reference for UX, accessibility, chart and font lookups. Hallmark still leads and `design.md` still decides: never let its search results override them, and do not use its `--persist` option, because `design-system/` would compete with `design.md`.
+- Impeccable is installed at `.claude/skills/impeccable` for reviewing and refining work: `critique`, `audit`, `polish`, `harden`, `clarify`, `adapt`, `onboard`. It must not choose the visual direction or rewrite `design.md` unless the user asks for that. Don't install its automatic hook. Telemetry is off in `.impeccable/config.json`.
 
 When working on the backend we need to pass the 3 layers:
 DTO >> Controller >> Service >> Repository (no shortcuts)
