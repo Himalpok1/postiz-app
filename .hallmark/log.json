@@ -1,0 +1,45 @@
+[
+ {
+  "scope": "app",
+  "shape": "app screen",
+  "theme": "custom: locked design.md",
+  "prompt": "First-run checklist on the calendar and an AI tools settings tab",
+  "signature": "three-step first post checklist above the calendar",
+  "waived": [
+   "26b: these screens have no disabled controls"
+  ],
+  "date": "2026-11-05",
+  "mode": "build"
+ },
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "page",
+  "shape": "room walk",
+  "theme": "custom (design.md)",
+  "axes": "light/grotesk-sans/warm",
+  "hero": "Banner",
+  "nav": "three-part bar",
+  "footer": "mast",
+  "imagery": "screenshots",
+  "photos": [],
+  "entry": "none",
+  "fingerprint": "home-2026-11-05",
+  "sections": [
+   "hero",
+   "week and post status",
+   "analytics",
+   "media",
+   "channel wall",
+   "plan ledger",
+   "small print",
+   "close"
+  ],
+  "signature": "the real week calendar on the room color, and plain words about what is not there yet",
+  "waived": [
+   "59"
+  ],
+  "prompt": "homepage looks like a template more than a company",
+  "date": "2026-11-05"
+ }
+]
