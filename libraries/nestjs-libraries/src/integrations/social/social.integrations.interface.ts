@@ -76,6 +76,8 @@ export interface AnalyticsData {
   label: string;
   data: Array<{ total: string; date: string }>;
   percentageChange: number;
+  // How the value is counted, when it isn't a plain number or a percentage
+  unit?: 'seconds';
 }
 
 

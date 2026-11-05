@@ -1068,13 +1068,13 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
       data?.map((d: any) => ({
         label:
           d.name === 'page_total_media_view_unique'
-            ? 'Page Impressions'
+            ? 'Media viewers'
             : d.name === 'page_post_engagements'
-            ? 'Posts Engagement'
+            ? 'Post engagements'
             : d.name === 'page_daily_follows'
-            ? 'Page followers'
+            ? 'New followers'
             : 'Media views',
-        percentageChange: 5,
+        percentageChange: 0,
         data: d?.values?.map((v: any) => ({
           total: sumValue(v.value),
           date: dayjs(v.end_time).format('YYYY-MM-DD'),

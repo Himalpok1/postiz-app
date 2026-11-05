@@ -989,6 +989,7 @@ export class YoutubeProvider extends SocialAbstract implements SocialProvider {
       acc.push({
         label: 'Average View Duration',
         average: true,
+        unit: 'seconds',
         data: mappedData?.map((p: any) => ({
           total: p.averageViewDuration,
           date: p.day,

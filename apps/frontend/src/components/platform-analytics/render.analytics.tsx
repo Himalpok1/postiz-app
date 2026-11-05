@@ -10,8 +10,14 @@ interface AnalyticsDataItem {
   label: string;
   data: Array<{ total: number; date: string }>;
   average?: boolean;
+  unit?: 'seconds';
   percentageChange?: number;
 }
+
+const formatSeconds = (value: number) => {
+  const total = Math.round(value);
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+};
 
 const TrendIndicator: FC<{ value: number; average?: boolean }> = ({
   value,
@@ -221,6 +227,9 @@ export const RenderAnalytics: FC<{
       const value =
         (p?.data.reduce((acc: number, curr: { total: number }) => acc + curr.total, 0) || 0) /
         (p.average ? p.data.length : 1);
+      if (p.unit === 'seconds') {
+        return formatSeconds(value);
+      }
       if (p.average) {
         return value.toFixed(2) + '%';
       }
