@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pricing | Castrapid</title>
+<meta name="description" content="Castrapid plans from $19 a month, priced by channels, each with a 7-day trial.">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Onest:wght@400;600&display=swap">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body class="room--billing">
+<header class="room--billing" style="background:var(--room)">
+<nav class="nav container" aria-label="Main">
+<a class="nav__home" href="/" aria-label="Castrapid home"><img src="/img/wordmark.svg" width="170" height="32" alt=""></a>
+<div class="nav__tiles"><ul class="tiles">
+<li><a class="tile tile--features" href="/features">Features</a></li>
+<li><a class="tile tile--channels" href="/channels">Channels</a></li>
+<li><a class="tile tile--pricing" href="/pricing" aria-current="page">Pricing</a></li>
+</ul></div>
+<div class="nav__end"><a class="nav__login" href="/auth/login">Log in</a><a class="btn" href="mailto:support@castrapid.com">Contact us</a></div>
+</nav>
+</header>
+<main>
+<section class="hero"><div class="container intro head--split">
+<h1>Priced by how many channels you run.</h1>
+<p class="lead">Every plan starts with a 7-day trial. A card is required.</p>
+</div></section>
+<section class="room room--billing" style="padding-block-start:0">
+<div class="container">
+<fieldset class="period"><legend>Billing period</legend>
+<input type="radio" name="period" id="period-month" checked><label for="period-month">Monthly</label>
+<input type="radio" name="period" id="period-year"><label for="period-year">Annual, pay for 10 months</label>
+</fieldset>
+<div class="sheet"><div class="scroller" tabindex="0" role="region" aria-label="Plan comparison"><table class="compare">
+<thead><tr><th scope="col">Plan</th><th scope="col">Starter</th><th scope="col">Team</th><th scope="col">Pro</th><th scope="col">Agency</th></tr></thead>
+<tbody>
+<tr><th scope="row">Price <span class="price--month">a month</span><span class="price--year">a year</span></th><td><span class="price--month">$19</span><span class="price--year">$190</span></td><td><span class="price--month">$29</span><span class="price--year">$290</span></td><td><span class="price--month">$39</span><span class="price--year">$390</span></td><td><span class="price--month">$79</span><span class="price--year">$790</span></td></tr>
+<tr><th scope="row">Channels</th><td>5</td><td>10</td><td>30</td><td>100</td></tr>
+<tr><th scope="row">Team members</th><td>1 user</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+<tr><th scope="row">Storage</th><td>10 GB</td><td>25 GB</td><td>50 GB</td><td>200 GB</td></tr>
+<tr><th scope="row">X posts a month</th><td>300</td><td>500</td><td>750</td><td>1,500</td></tr>
+<tr><th scope="row">X link posts a month</th><td>10</td><td>20</td><td>30</td><td>60</td></tr>
+<tr><th scope="row">YouTube uploads a day</th><td>3</td><td>5</td><td>10</td><td>25</td></tr>
+<tr><th scope="row">RSS auto-post</th><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+</tbody>
+</table></div><p class="sample swipe">Swipe to compare plans.</p><p class="sample">X analytics are an optional add-on: $5 a month per X account, for up to 300 posts a month.</p></div>
+</div>
+</section>
+<section class="room room--white">
+<div class="container qa">
+<h2>Billing, plainly.</h2>
+<div class="qa__list">
+<details><summary>When is my card charged?</summary><p>When the 7-day trial ends, unless you cancel first.</p></details>
+<details><summary>Can I cancel at any time?</summary><p>Yes, from the billing page. Access lasts until your paid period ends.</p></details>
+<details><summary>Are payments refundable?</summary><p>Not unless the law requires it. See the <a href="/terms">Terms of Service</a>.</p></details>
+<details><summary>Why are X and YouTube limited?</summary><p>X charges per post, and more with links. YouTube caps daily uploads.</p></details>
+</div>
+</div>
+</section>
+
+<section class="close">
+<div class="container close__grid">
+<h2>Castrapid opens soon. Say hello before then.</h2>
+<div class="close__action"><a class="btn" href="mailto:support@castrapid.com">Contact us</a><a href="mailto:support@castrapid.com">support@castrapid.com</a></div>
+</div>
+</section>
+</main>
+<footer class="foot">
+<div class="container">
+<a class="foot__mark" href="/" aria-label="Castrapid home"><img src="/img/wordmark.svg" width="680" height="128" alt=""></a>
+<ul class="foot__links">
+<li><a href="/features">Features</a></li>
+<li><a href="/channels">Channels</a></li>
+<li><a href="/pricing">Pricing</a></li>
+<li><a href="/auth/login">Log in</a></li>
+<li><a href="/terms">Terms of Service</a></li>
+<li><a href="/privacy">Privacy Policy</a></li>
+<li><a href="https://github.com/Himalpok1/postiz-app">Source code (AGPL-3.0)</a></li>
+</ul>
+
+</div>
+</footer>
+</body>
+</html>

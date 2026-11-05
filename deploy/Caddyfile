@@ -3,7 +3,7 @@
 :80 {
 	encode gzip
 
-	@site path /terms /terms/* /privacy /privacy/* /img/calendar.jpg
+	@site path /terms /terms/* /privacy /privacy/* /features /features/* /channels /channels/* /pricing /pricing/* /site.css /img/*
 	handle @site {
 		root * /srv/site
 		file_server
