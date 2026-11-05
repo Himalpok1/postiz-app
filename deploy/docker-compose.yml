@@ -47,9 +47,12 @@ services:
     container_name: castrapid-web
     restart: always
     ports:
-      - '127.0.0.1:${WEB_PORT:-8088}:80'
+      - '${WEB_BIND:-127.0.0.1}:${WEB_PORT:-8088}:80'
+      - '${WEB_BIND:-127.0.0.1}:${WEB_TLS_PORT:-8443}:443'
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:-}
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CADDYFILE:-./Caddyfile}:/etc/caddy/Caddyfile:ro
       - ../site:/srv/site:ro
       - castrapid-caddy-data:/data
     networks:

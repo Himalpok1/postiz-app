@@ -1,0 +1,20 @@
+# The app on its own domain, with HTTPS from Caddy. The public website is on castrapid.com.
+{$APP_DOMAIN} {
+	encode gzip
+
+	# Public pages live on the main site, so old links to them keep working.
+	@site path /terms /terms/* /privacy /privacy/* /features /features/* /channels /channels/* /pricing /pricing/*
+	redir @site https://castrapid.com{uri} 302
+
+	# AI tools (Claude, ChatGPT, Cursor) connect at the root of the domain and look for
+	# their sign-in details there. The API serves these under /api.
+	@ai-tools path /mcp* /sse/* /.well-known/oauth-protected-resource* /.well-known/oauth-authorization-server* /.well-known/openid-configuration*
+	handle @ai-tools {
+		rewrite * /api{uri}
+		reverse_proxy castrapid:5000
+	}
+
+	handle {
+		reverse_proxy castrapid:5000
+	}
+}

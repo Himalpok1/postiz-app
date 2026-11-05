@@ -25,6 +25,21 @@ Stop the old stack first. Otherwise both machines could publish the same schedul
 
 Volumes: `castrapid-postgres`, `castrapid-redis`, `castrapid-uploads`, `castrapid-caddy-data`, `castrapid-temporal-postgres`, `castrapid-temporal-elasticsearch`.
 
+## Running on a server
+
+The live app runs at `https://app.castrapid.com`. Its `deploy/.env` differs from the local one in these lines, and has no `NOT_SECURED`:
+
+```
+PUBLIC_URL=https://app.castrapid.com
+APP_DOMAIN=app.castrapid.com
+CADDYFILE=./Caddyfile.vps
+WEB_BIND=0.0.0.0
+WEB_PORT=80
+WEB_TLS_PORT=443
+```
+
+Create the owner account before starting `castrapid-web`, because while signup is closed the first person to register gets in. `deploy/backup.sh` runs nightly from cron and keeps 7 days in `/var/backups/castrapid`. Those copies are on the same machine, so they don't protect against losing it.
+
 ## While payments are off
 
 `ALLOW_UNBILLED_LOCAL_DEV=true` lets the app start without Stripe keys, and every account then counts as fully paid. So keep `DISABLE_REGISTRATION=true`: only the first account can sign up. Remove the flag when Stripe keys are added.
