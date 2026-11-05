@@ -2,9 +2,9 @@
  * paper: the room color of each band · accent: #0F6B52 · display: Bricolage Grotesque · body: Onest
  * nav: three-part bar, wordmark, room tiles, log in and one action · footer: mast, the wordmark over the links · hero: Stage (/), Banner (/features, /channels, /pricing)
  * signature: the site walks through the app's rooms, each band wearing the room color its nav tile wears
- * axes: light/grotesk-sans/warm · posture: full-palette, room color as field, accent as signal, tag and status colors on the post · contrast: pass · imagery: approved calendar mock in hero, built samples in data-slots, library 6 · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, the channel and plan sections could sit on a rival's page; the rooms and the post cards carry what is ours */
-/* Hallmark · waive 84 · built analytics sample in a data-slot, no captured screen · this run has no login to the local app and no account with connected channels to show */
+ * axes: light/grotesk-sans/warm · posture: full-palette, room color as field, accent as signal, tag and status colors on the post · contrast: pass · imagery: screenshots 7 from a sample account, one built analytics sample · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, the channel and plan sections could sit on a rival's page; the rooms and the real calendar carry what is ours */
+/* Hallmark · waive 84 · built analytics sample in a data-slot, every other screen is captured · analytics only shows figures from a really connected channel, and none is connected yet */
 /* Hallmark · dismissed 58 · the features page holds a real list of rows in the window, cut to what each row needs */
 /* Hallmark · dismissed F25 · the first column of the plan table is pinned and the rest scrolls on a phone */
 /* Hallmark · dismissed 77 · /channels and /pricing are sub-pages of the home page, so the six-section minimum belongs to / */
@@ -97,23 +97,14 @@ p { margin: 0; text-wrap: pretty; }
 .intro { padding-block: var(--space-xl) var(--section-gap); }
 .intro h1 { font-size: var(--text-display-s); max-width: 20ch; }
 
-/* Post cards: neutral, with tag and status doing the talking */
-.posts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-md); margin: 0; padding: 0; list-style: none; }
-.post { display: flex; flex-direction: column; gap: var(--space-sm); padding: var(--space-md); background: var(--color-paper-2); border-radius: var(--radius-card); }
-.post__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-xs); font-weight: 600; font-variant-numeric: tabular-nums; }
-.post img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: var(--space-sm); }
-.post__title { font-weight: 600; line-height: 1.35; }
-.post__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-xs); margin-top: auto; min-height: 36px; }
-.post__logos { display: flex; gap: var(--space-2xs); }
-.post__logos img { width: 24px; height: 24px; aspect-ratio: auto; border-radius: 0; }
-.chip { align-self: flex-start; padding: var(--space-2xs) var(--space-xs); border-radius: var(--space-xs); font-size: var(--text-sm); font-weight: 600; line-height: 1.2; }
-.chip--1 { background: var(--tag-1); } .chip--2 { background: var(--tag-2); } .chip--3 { background: var(--tag-3); } .chip--5 { background: var(--tag-5); }
-.badge { display: inline-flex; align-items: center; gap: var(--space-2xs); padding: var(--space-2xs) var(--space-xs); border-radius: var(--radius-pill); font-size: var(--text-sm); font-weight: 600; line-height: 1.2; }
-.badge svg { width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.badge--draft { background: var(--st-draft); } .badge--scheduled { background: var(--st-scheduled); } .badge--published { background: var(--st-published); } .badge--failed { background: var(--st-failed); }
-.post__fix { display: inline-flex; align-items: center; min-height: 36px; padding-inline: var(--space-md); border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-accent-ink); font-size: var(--text-sm); font-weight: 600; }
-.note { margin-top: var(--space-lg); color: var(--color-ink-2); }
-
+/* Real screens from the app */
+.cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap-columns); align-items: start; margin: 0; padding: 0; list-style: none; }
+.cards img { width: 100%; border-radius: var(--radius-card); }
+.screens { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap-columns); align-items: start; }
+.screens figure { margin: 0; min-width: 0; padding: var(--space-md); background: var(--color-paper-2); border-radius: var(--radius-sheet); }
+.screens img { width: 100%; border-radius: var(--radius-card); }
+.shot { margin: 0 0 var(--space-lg); }
+.shot img { width: 100%; border-radius: var(--radius-card); }
 /* Split: words beside a sheet */
 .split { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: var(--gap-columns); align-items: center; }
 .split--even { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
@@ -139,17 +130,6 @@ p { margin: 0; text-wrap: pretty; }
 .sample { margin-top: var(--space-sm); font-size: var(--text-sm); color: var(--color-muted); }
 
 .swipe { display: none; }
-/* Media library and channel versions sample */
-.composer { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap-columns); align-items: center; }
-.library { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-xs); }
-.library img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-card); }
-.library img:first-child { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
-.versions { display: grid; gap: var(--space-lg); margin: 0; padding: 0; list-style: none; }
-.versions li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: var(--space-sm); }
-.versions img { width: 24px; height: 24px; }
-.versions p { margin-top: var(--space-2xs); }
-.sheet > .versions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-columns); }
-.sheet > .sample + .rows { margin-top: var(--space-lg); }
 /* Channels */
 .chans { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--space-lg) var(--space-sm); margin: 0; padding: 0; list-style: none; }
 .chan { display: grid; justify-items: center; gap: var(--space-xs); text-align: center; font-size: var(--text-sm); font-weight: 600; line-height: 1.25; }
@@ -227,7 +207,7 @@ p { margin: 0; text-wrap: pretty; }
 @media (max-width: 75rem) {
   .nav { grid-template-columns: minmax(0, 1fr) auto; }
   .nav__tiles { grid-column: 1 / -1; grid-row: 2; overflow-x: auto; }
-  .posts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .split, .split--even { grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
   .chans { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xl) 0; }
@@ -240,7 +220,7 @@ p { margin: 0; text-wrap: pretty; }
   .hero__shot { width: 100%; max-width: 100%; height: 420px; padding: 0; overflow: hidden; border-radius: var(--radius-card); }
   .hero__shot img { width: 260%; max-width: none; margin-inline-start: -71%; border-radius: 0; }
   .swipe { display: block; }
-  .composer, .sheet > .versions { grid-template-columns: minmax(0, 1fr); }
+  .screens { grid-template-columns: minmax(0, 1fr); }
   .chart text { font-size: 28px; }
   .head { margin-bottom: var(--space-xl); }
   .head--split, .qa, .close__grid { grid-template-columns: minmax(0, 1fr); }
@@ -254,7 +234,7 @@ p { margin: 0; text-wrap: pretty; }
   .chans { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @media (max-width: 40rem) {
-  .posts { grid-template-columns: minmax(0, 1fr); }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); }
   .plans { grid-template-columns: minmax(0, 1fr); }
   .plan { padding-inline: 0; border-inline-start: 0; }
   .plan + .plan { padding-top: var(--space-xl); border-top: 1px solid var(--color-rule); }
