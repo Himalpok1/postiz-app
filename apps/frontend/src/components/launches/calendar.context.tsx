@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react';
 import dayjs from 'dayjs';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { Post, Integration, Tags } from '@prisma/client';
 import { useSearchParams } from 'next/navigation';
@@ -383,10 +383,12 @@ export const CalendarWeekProvider: FC<{
   }, [posts]);
 
   // Combined reload function that handles both calendar and list views
+  const { mutate: mutateKey } = useSWRConfig();
   const reloadCalendarView = useCallback(() => {
     mutateCalendar();
     mutateList();
-  }, [mutateCalendar, mutateList]);
+    mutateKey('/posts/first-run');
+  }, [mutateCalendar, mutateList, mutateKey]);
 
   // Determine loading state based on current view
   const loading = filters.display === 'list' ? listIsLoading : calendarIsLoading;

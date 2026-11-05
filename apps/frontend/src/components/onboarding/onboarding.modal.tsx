@@ -33,7 +33,7 @@ export const OnboardingModal: FC<OnboardingModalProps> = ({ onClose }) => {
   const steps = useMemo(
     () => [
       t('connect_channels', 'Connect Channels'),
-      t('connect_agents', 'Connect Agents'),
+      t('connect_agents', 'Connect AI tools'),
     ],
     [t]
   );

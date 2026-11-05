@@ -26,6 +26,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { DNDProvider } from '@gitroom/frontend/components/launches/helpers/dnd.provider';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
 import { NewPost } from '@gitroom/frontend/components/launches/new.post';
+import { FirstRunChecklist } from '@gitroom/frontend/components/launches/first.run.checklist';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useIntegrationList } from '@gitroom/frontend/components/launches/helpers/use.integration.list';
 import useCookie from 'react-use-cookie';
@@ -707,6 +708,10 @@ export const LaunchesComponent = () => {
           </div>
         )}
         <div className="flex-1 min-w-0 flex-col flex p-[24px] mobile:p-[12px] gap-[12px] mobile:min-h-[600px]">
+          <FirstRunChecklist
+            channels={sortedIntegrations.length}
+            update={() => update(true)}
+          />
           <div className="hidden mobile:flex gap-[8px]">
             <div
               onClick={() => setChannelsOpen(true)}
@@ -738,7 +743,7 @@ export const LaunchesComponent = () => {
             )}
           </div>
           <Filters />
-          <div className="flex-1 flex">
+          <div className="flex-1 flex mobile:min-h-[420px]">
             <Calendar />
           </div>
         </div>

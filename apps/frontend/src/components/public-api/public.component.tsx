@@ -9,8 +9,6 @@ import { useVariables } from '@gitroom/react/helpers/variable.context';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { useDecisionModal } from '@gitroom/frontend/components/layout/new-modal';
-import { McpClientIcon } from '@gitroom/frontend/components/public-api/mcp.client.icons';
-import clsx from 'clsx';
 
 // Remote clients can't set headers, they get a URL to paste (hint = where)
 export const remoteMcpClients = {
@@ -266,160 +264,9 @@ export const CopyButton = ({
   );
 };
 
-const McpSection = ({
-  user,
-  mcpBase,
-}: {
-  user: { publicApi: string };
-  mcpBase: string;
-}) => {
-  const t = useT();
-  const [activeClient, setActiveClient] = useState<AnyMcpClient>('Claude');
-  const tabs: McpAuth[] = ['oauth', 'apikey'];
-  const [auth, setAuth] = useState<McpAuth>('oauth');
-  const [revealed, setRevealed] = useState(false);
-
-  const { config, hint } = getMcpConfig(
-    activeClient,
-    auth,
-    mcpBase,
-    user.publicApi
-  );
-
-  const baseUrl = auth === 'oauth' ? getMcpOauthUrl(mcpBase) : `${mcpBase}/mcp`;
-
-  const maskedConfig =
-    revealed || auth === 'oauth'
-      ? config
-      : config.replace(
-          new RegExp(user.publicApi.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-          '*'.repeat(user.publicApi.length)
-        );
-
-  return (
-    <div className="bg-newBgColorInnerInner rounded-[12px] border border-newBorder overflow-hidden">
-      <div className="bg-newBgColorInner px-[20px] mobile:px-[14px] py-[14px] border-b border-newBorder flex items-start justify-between gap-[12px] mobile:flex-col">
-        <div>
-          <div className="text-[15px] font-[600]">
-            {t('mcp_client_configuration', 'MCP Client Configuration')}
-          </div>
-          <div className="text-[13px] text-customColor18 mt-[2px]">
-            {t(
-              'connect_your_mcp_client_to_postiz_to_schedule_your_posts_faster',
-              'Connect Castrapid MCP server to your client (Http streaming) to schedule your posts faster.'
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="p-[20px] mobile:p-[14px] flex flex-col gap-[16px]">
-        <div className="flex flex-col gap-[6px]">
-          <div className="text-[13px] font-[600] text-customColor18">
-            {t('auth_method', 'Authentication')}
-          </div>
-          <div className="flex flex-wrap gap-[6px]">
-            {tabs.map((m) => (
-              <button
-                key={m}
-                type="button"
-                className={clsx(
-                  'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors',
-                  auth === m
-                    ? 'bg-accent text-white'
-                    : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
-                )}
-                onClick={() => setAuth(m)}
-              >
-                {m === 'oauth'
-                  ? t('sign_in_no_api_key', 'Sign in with Castrapid (no API key)')
-                  : t('api_key', 'API Key')}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col gap-[6px]">
-          <div className="text-[13px] font-[600] text-customColor18">
-            {t('mcp_client', 'Client')}
-          </div>
-          <div className="flex flex-wrap gap-[6px]">
-            {[...Object.keys(remoteMcpClients), ...mcpClients].map((client) => (
-              <button
-                key={client}
-                type="button"
-                className={clsx(
-                  'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors flex items-center gap-[8px]',
-                  activeClient === client
-                    ? 'bg-accent text-white'
-                    : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
-                )}
-                onClick={() =>
-                  setActiveClient(client as AnyMcpClient)
-                }
-              >
-                <McpClientIcon client={client} />
-                {client}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col gap-[8px]">
-          <div className="text-[12px] text-customColor18 font-[500]">
-            {hint}
-            {auth === 'oauth' &&
-              ` ${t(
-                'oauth_sign_in_hint',
-                'Your agent will open a browser window to sign in to Castrapid.'
-              )}`}
-          </div>
-          <pre className="bg-newBgColorInner border border-newBorder rounded-[8px] p-[16px] text-[13px] whitespace-pre-wrap break-all overflow-x-auto leading-[1.6]">
-            {maskedConfig}
-          </pre>
-          <div className="flex flex-wrap gap-[8px]">
-            {auth === 'apikey' && (
-              <button
-                type="button"
-                onClick={() => setRevealed(!revealed)}
-                className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-pill text-[13px] font-[600] flex items-center gap-[6px]"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  {revealed ? (
-                    <>
-                      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
-                      <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </>
-                  ) : (
-                    <>
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </>
-                  )}
-                </svg>
-                {revealed ? t('hide', 'Hide') : t('reveal', 'Reveal')}
-              </button>
-            )}
-            <CopyButton text={config} label={t('copy', 'Copy')} />
-            {!isRemoteMcpClient(activeClient) && (
-              <CopyButton text={baseUrl} label={t('copy_url', 'Copy URL')} />
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const PublicApiContent = () => {
   const user = useUser();
-  const { backendUrl, frontEndUrl, mcpUrl } = useVariables();
+  const { frontEndUrl } = useVariables();
   const toaster = useToaster();
   const fetch = useFetch();
   const decision = useDecisionModal();
@@ -450,8 +297,6 @@ const PublicApiContent = () => {
   if (!user || !user.publicApi) {
     return null;
   }
-
-  const mcpBase = mcpUrl || backendUrl;
 
   return (
     <div className="flex flex-col gap-[40px]">
@@ -589,7 +434,15 @@ const PublicApiContent = () => {
         </div>
       </div>
 
-      <McpSection user={user} mcpBase={mcpBase} />
+      <div className="text-[14px] text-textColor">
+        {t(
+          'developers_ai_tools_note',
+          'Connecting Claude, ChatGPT or Cursor? Use the AI tools tab, no API key needed.'
+        )}{' '}
+        <a href="/settings?tab=ai_tools" className="underline hover:font-bold">
+          {t('open_ai_tools', 'Open AI tools')}
+        </a>
+      </div>
     </div>
   );
 };
@@ -599,7 +452,7 @@ export const PublicComponent = () => {
 
   return (
     <div className="flex flex-col gap-[20px]">
-      <h3 className="text-[20px]">{t('agents', 'Agents')}</h3>
+      <h3 className="text-[20px]">{t('developers', 'Developers')}</h3>
       <PublicApiContent />
     </div>
   );

@@ -23,6 +23,7 @@ import { LogoutComponent } from '@gitroom/frontend/components/layout/logout.comp
 import { useSearchParams } from 'next/navigation';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
 import { PublicComponent } from '@gitroom/frontend/components/public-api/public.component';
+import { AiToolsComponent } from '@gitroom/frontend/components/public-api/ai.tools.component';
 import Link from 'next/link';
 import { Webhooks } from '@gitroom/frontend/components/webhooks/webhooks';
 import { Sets } from '@gitroom/frontend/components/sets/sets';
@@ -89,7 +90,8 @@ export const SettingsPopup: FC<{
     arr.push({ tab: 'global_settings', label: t('global_settings', 'Global Settings') });
     // Populate tabs based on user permissions
     if (user?.tier?.public_api && isGeneral && showLogout) {
-      arr.push({ tab: 'agents', label: t('agents_dev', 'Agents / Dev') });
+      arr.push({ tab: 'ai_tools', label: t('ai_tools', 'AI tools') });
+      arr.push({ tab: 'agents', label: t('agents_dev', 'Developers') });
     }
     if (user?.tier?.team_members && isGeneral && user?.role !== 'USER') {
       arr.push({ tab: 'teams', label: t('teams', 'Teams') });
@@ -218,6 +220,15 @@ export const SettingsPopup: FC<{
                   <Plugs />
                 </div>
               )}
+
+              {tab === 'ai_tools' &&
+                !!user?.tier?.public_api &&
+                isGeneral &&
+                showLogout && (
+                  <div>
+                    <AiToolsComponent />
+                  </div>
+                )}
 
               {tab === 'agents' &&
                 !!user?.tier?.public_api &&

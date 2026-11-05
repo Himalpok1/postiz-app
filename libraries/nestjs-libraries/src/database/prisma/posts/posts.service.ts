@@ -493,6 +493,10 @@ export class PostsService {
     ];
   }
 
+  getFirstRunProgress(orgId: string) {
+    return this._postRepository.getFirstRunProgress(orgId);
+  }
+
   async getPosts(orgId: string, query: GetPostsDto) {
     return this._postRepository.getPosts(orgId, query);
   }

@@ -154,6 +154,11 @@ export class PostsController {
     return this._postsService.getPostsList(org.id, query);
   }
 
+  @Get('/first-run')
+  getFirstRunProgress(@GetOrgFromRequest() org: Organization) {
+    return this._postsService.getFirstRunProgress(org.id);
+  }
+
   @Get('/old')
   oldPosts(
     @GetOrgFromRequest() org: Organization,

@@ -152,6 +152,36 @@ export class PostsRepository {
     }
   }
 
+  async getFirstRunProgress(orgId: string) {
+    const where = {
+      organizationId: orgId,
+      deletedAt: null,
+      parentPostId: null,
+    };
+    const select = { id: true };
+    const [draft, post, scheduledPost] = await Promise.all([
+      this._post.model.post.findFirst({
+        where: { ...where, state: State.DRAFT },
+        orderBy: { publishDate: 'asc' },
+        select: { publishDate: true },
+      }),
+      this._post.model.post.findFirst({ where, select }),
+      this._post.model.post.findFirst({
+        where: {
+          ...where,
+          state: { in: [State.QUEUE, State.PUBLISHED, State.ERROR] },
+        },
+        select,
+      }),
+    ]);
+
+    return {
+      hasPost: !!post,
+      hasScheduledPost: !!scheduledPost,
+      draftDate: draft?.publishDate || null,
+    };
+  }
+
   async getPosts(orgId: string, query: GetPostsDto) {
     // Use the provided start and end dates directly
     const startDate = dayjs.utc(query.startDate).toDate();
