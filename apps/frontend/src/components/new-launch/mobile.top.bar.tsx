@@ -17,7 +17,7 @@ export interface MobileTopBarAction {
 
 const actionColors = {
   primary: 'bg-btnPrimary text-white',
-  secondary: 'bg-[#D82D7E] text-white',
+  secondary: 'bg-accent text-white',
   tertiary: 'bg-btnSimple text-btnText',
 };
 
@@ -39,7 +39,7 @@ export const MobileTopBar: FC<{
     <div className="hidden mobile:flex sticky top-0 z-[450] h-[60px] items-center gap-[8px] px-[16px] bg-newBgColorInner select-none">
       <div
         onClick={onBack}
-        className="w-[24px] h-[24px] flex justify-center items-center cursor-pointer text-[#A3A3A3]"
+        className="w-[24px] h-[24px] flex justify-center items-center cursor-pointer text-muted"
       >
         <ChevronLeftIcon strokeWidth={1.5} className="rtl:rotate-180" />
       </div>
@@ -49,7 +49,7 @@ export const MobileTopBar: FC<{
           disabled={disabled}
           onClick={() => (single ? actions[0].onClick() : setOpen(!open))}
           className={clsx(
-            'relative min-w-[92px] h-[34px] rounded-[6px] flex justify-center items-center gap-[8px] text-[13px] font-[600] bg-btnPrimary text-white disabled:bg-btnSimple disabled:text-textItemBlur disabled:cursor-not-allowed',
+            'relative min-w-[92px] h-[34px] rounded-pill flex justify-center items-center gap-[8px] text-[13px] font-[600] bg-btnPrimary text-white disabled:bg-btnSimple disabled:text-textItemBlur disabled:cursor-not-allowed',
             single ? 'px-[16px]' : 'ps-[24px] pe-[12px]'
           )}
         >

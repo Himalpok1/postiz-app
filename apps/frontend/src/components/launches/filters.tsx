@@ -61,7 +61,9 @@ export const Filters = () => {
       case 'day':
         return startDate.format(short ? 'ddd (L)' : 'dddd (L)');
       case 'week':
-        return `${startDate.format('L')} - ${endDate.format('L')}`;
+        return startDate.isSame(endDate, 'month')
+          ? `${startDate.format('MMM D')} to ${endDate.format('D, YYYY')}`
+          : `${startDate.format('MMM D')} to ${endDate.format('MMM D, YYYY')}`;
       case 'month':
         return startDate.format('MMMM YYYY');
       default:
@@ -295,10 +297,10 @@ export const Filters = () => {
       {/* phones: view switcher and filter first, then the date or list row */}
       {!isListView && (
         <div className="flex flex-grow flex-row items-center gap-[10px] mobile:order-3 mobile:basis-full mobile:min-w-0 mobile:gap-[8px]">
-          <div className="border h-[42px] border-newTableBorder bg-newTableBorder gap-[1px] flex items-center rounded-[8px] overflow-hidden mobile:flex-1 mobile:min-w-0">
+          <div className="h-[42px] bg-newBgColorInner gap-[4px] flex items-center overflow-hidden mobile:flex-1 mobile:min-w-0">
             <div
               onClick={previous}
-              className="cursor-pointer text-textColor rtl:rotate-180 px-[9px] mobile:px-0 mobile:w-[36px] bg-newBgColorInner h-full flex items-center justify-center hover:text-textItemFocused hover:bg-boxFocused"
+              className="cursor-pointer text-textColor rtl:rotate-180 w-[36px] h-[36px] rounded-full bg-paper3 flex items-center justify-center shrink-0 hover:text-textItemFocused hover:bg-boxFocused"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -316,8 +318,8 @@ export const Filters = () => {
                 />
               </svg>
             </div>
-            <div className="min-w-[200px] mobile:min-w-0 mobile:flex-1 text-center bg-newBgColorInner h-full flex items-center justify-center">
-              <div className="py-[3px] px-[9px] mobile:px-[4px] rounded-[5px] transition-all text-[14px] mobile:truncate">
+            <div className="min-w-[200px] mobile:min-w-0 mobile:flex-1 text-center h-full flex items-center justify-center font-[600]">
+              <div className="py-[3px] px-[9px] mobile:px-[4px] rounded-[5px] transition text-[14px] mobile:truncate">
                 <span className="mobile:hidden">{getDisplayText()}</span>
                 <span className="hidden mobile:inline">
                   {getDisplayText(true)}
@@ -326,7 +328,7 @@ export const Filters = () => {
             </div>
             <div
               onClick={next}
-              className="cursor-pointer text-textColor rtl:rotate-180 px-[9px] mobile:px-0 mobile:w-[36px] bg-newBgColorInner h-full flex items-center justify-center hover:text-textItemFocused hover:bg-boxFocused"
+              className="cursor-pointer text-textColor rtl:rotate-180 w-[36px] h-[36px] rounded-full bg-paper3 flex items-center justify-center shrink-0 hover:text-textItemFocused hover:bg-boxFocused"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -349,7 +351,7 @@ export const Filters = () => {
             <div className="text-center flex h-[42px]">
               <div
                 onClick={setToday}
-                className="hover:text-textItemFocused hover:bg-boxFocused py-[3px] px-[9px] flex justify-center items-center rounded-[8px] transition-all cursor-pointer text-[14px] bg-newBgColorInner border border-newTableBorder"
+                className="hover:bg-rule px-[16px] flex justify-center items-center rounded-pill transition-colors duration-[120ms] cursor-pointer text-[14px] font-[600] bg-paper3"
               >
                 {t('today', 'Today')}
               </div>
@@ -361,14 +363,14 @@ export const Filters = () => {
         <div className="flex flex-grow flex-row items-center gap-[10px] mobile:flex-wrap mobile:order-3 mobile:basis-full mobile:min-w-0 mobile:gap-[8px]">
           <div
             className={clsx(
-              'border h-[42px] border-newTableBorder bg-newTableBorder gap-[1px] flex items-center rounded-[8px] overflow-hidden mobile:order-2 mobile:w-full',
+              'h-[42px] bg-newBgColorInner gap-[4px] flex items-center overflow-hidden mobile:order-2 mobile:w-full',
               calendar.listTotalPages <= 1 && 'mobile:hidden'
             )}
           >
             <div
               onClick={previousPage}
               className={clsx(
-                'text-textColor rtl:rotate-180 px-[9px] mobile:px-0 mobile:w-[36px] bg-newBgColorInner h-full flex items-center justify-center',
+                'text-textColor rtl:rotate-180 w-[36px] h-[36px] rounded-full bg-paper3 flex items-center justify-center shrink-0',
                 calendar.listPage > 0
                   ? 'cursor-pointer hover:text-textItemFocused hover:bg-boxFocused'
                   : 'opacity-50 cursor-not-allowed'
@@ -390,15 +392,15 @@ export const Filters = () => {
                 />
               </svg>
             </div>
-            <div className="min-w-[200px] mobile:min-w-0 mobile:flex-1 text-center bg-newBgColorInner h-full flex items-center justify-center">
-              <div className="py-[3px] px-[9px] rounded-[5px] transition-all text-[14px]">
+            <div className="min-w-[200px] mobile:min-w-0 mobile:flex-1 text-center h-full flex items-center justify-center font-[600]">
+              <div className="py-[3px] px-[9px] rounded-[5px] transition text-[14px]">
                 {t('page', 'Page')} {calendar.listPage + 1} {t('of', 'of')} {Math.max(1, calendar.listTotalPages)}
               </div>
             </div>
             <div
               onClick={nextPage}
               className={clsx(
-                'text-textColor rtl:rotate-180 px-[9px] mobile:px-0 mobile:w-[36px] bg-newBgColorInner h-full flex items-center justify-center',
+                'text-textColor rtl:rotate-180 w-[36px] h-[36px] rounded-full bg-paper3 flex items-center justify-center shrink-0',
                 calendar.listPage < calendar.listTotalPages - 1
                   ? 'cursor-pointer hover:text-textItemFocused hover:bg-boxFocused'
                   : 'opacity-50 cursor-not-allowed'
@@ -421,15 +423,15 @@ export const Filters = () => {
               </svg>
             </div>
           </div>
-          <div className="flex flex-row p-[4px] border border-newTableBorder rounded-[8px] text-[14px] font-[500] mobile:order-1 mobile:w-full mobile:overflow-x-auto">
+          <div className="flex flex-row p-[4px] bg-paper3 rounded-pill text-[14px] font-[500] mobile:order-1 mobile:w-full mobile:overflow-x-auto">
             {listStateOptions.map((option) => (
               <div
                 key={option.value}
                 onClick={setListStateFilter(option.value)}
                 className={clsx(
-                  'pt-[6px] pb-[5px] cursor-pointer min-w-[80px] px-[12px] text-center rounded-[6px] mobile:flex-1 mobile:min-w-fit mobile:px-[8px] mobile:whitespace-nowrap',
+                  'pt-[6px] pb-[5px] cursor-pointer min-w-[80px] px-[12px] text-center rounded-pill mobile:flex-1 mobile:min-w-fit mobile:px-[8px] mobile:whitespace-nowrap',
                   calendar.listState === option.value &&
-                    'text-textItemFocused bg-boxFocused'
+                    'text-newBgColorInner bg-ink'
                 )}
               >
                 {option.label}
@@ -452,28 +454,28 @@ export const Filters = () => {
         <div
           onClick={() => setFiltersOpen(true)}
           className={clsx(
-            'hidden mobile:flex mobile:order-2 relative w-[42px] h-[42px] rounded-[8px] border justify-center items-center cursor-pointer',
+            'hidden mobile:flex mobile:order-2 relative w-[42px] h-[42px] rounded-full border justify-center items-center cursor-pointer',
             calendar.selectedChannels
-              ? 'border-[#612BD3] text-[#612BD3]'
+              ? 'border-accent text-accent'
               : 'border-newTableBorder'
           )}
         >
           <FilterIcon />
           {calendar.selectedChannels && (
-            <div className="absolute top-[6px] end-[6px] w-[6px] h-[6px] rounded-full bg-[#612BD3]" />
+            <div className="absolute top-[6px] end-[6px] w-[6px] h-[6px] rounded-full bg-accent" />
           )}
         </div>
       )}
       <div
         className={clsx(
-          'flex flex-row p-[4px] border border-newTableBorder rounded-[8px] text-[14px] font-[500] mobile:order-1 mobile:flex-1 mobile:overflow-x-auto',
+          'flex flex-row p-[4px] bg-paper3 rounded-pill text-[14px] font-[500] mobile:order-1 mobile:flex-1 mobile:overflow-x-auto',
           isListView && 'hidden mobile:flex'
         )}
       >
         <div
           className={clsx(
-            'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',
-            calendar.display === 'day' && 'text-textItemFocused bg-boxFocused'
+            'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-pill',
+            calendar.display === 'day' && 'text-newBgColorInner bg-ink'
           )}
           onClick={setDay}
         >
@@ -481,8 +483,8 @@ export const Filters = () => {
         </div>
         <div
           className={clsx(
-            'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',
-            calendar.display === 'week' && 'text-textItemFocused bg-boxFocused'
+            'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-pill',
+            calendar.display === 'week' && 'text-newBgColorInner bg-ink'
           )}
           onClick={setWeek}
         >
@@ -490,8 +492,8 @@ export const Filters = () => {
         </div>
         <div
           className={clsx(
-            'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',
-            calendar.display === 'month' && 'text-textItemFocused bg-boxFocused'
+            'pt-[6px] pb-[5px] cursor-pointer w-[74px] mobile:w-auto mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-pill',
+            calendar.display === 'month' && 'text-newBgColorInner bg-ink'
           )}
           onClick={setMonth}
         >
@@ -500,20 +502,20 @@ export const Filters = () => {
         {/* the list toggle joins the view switcher on phones */}
         <div
           className={clsx(
-            'hidden mobile:block pt-[6px] pb-[5px] cursor-pointer mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-[6px]',
-            isListView && 'text-textItemFocused bg-boxFocused'
+            'hidden mobile:block pt-[6px] pb-[5px] cursor-pointer mobile:flex-1 mobile:min-w-fit mobile:px-[6px] mobile:whitespace-nowrap text-center rounded-pill',
+            isListView && 'text-newBgColorInner bg-ink'
           )}
           onClick={setList}
         >
           {t('list', 'List')}
         </div>
       </div>
-      <div className="flex flex-row p-[4px] border border-newTableBorder rounded-[8px] text-[14px] font-[500] mobile:hidden">
+      <div className="flex flex-row p-[4px] bg-paper3 rounded-pill text-[14px] font-[500] mobile:hidden">
         <div
           onClick={setCalendarView}
           className={clsx(
-            'pt-[6px] pb-[5px] cursor-pointer flex justify-center items-center w-[34px] text-center rounded-[6px]',
-            !isListView && 'text-textItemFocused bg-boxFocused'
+            'pt-[6px] pb-[5px] cursor-pointer flex justify-center items-center w-[34px] text-center rounded-pill',
+            !isListView && 'text-newBgColorInner bg-ink'
           )}
         >
           {/*calendar*/}
@@ -536,8 +538,8 @@ export const Filters = () => {
         <div
           onClick={setList}
           className={clsx(
-            'pt-[6px] pb-[5px] flex justify-center items-center cursor-pointer w-[34px] text-center rounded-[6px]',
-            isListView && 'text-textItemFocused bg-boxFocused'
+            'pt-[6px] pb-[5px] flex justify-center items-center cursor-pointer w-[34px] text-center rounded-pill',
+            isListView && 'text-newBgColorInner bg-ink'
           )}
         >
           {/*list*/}

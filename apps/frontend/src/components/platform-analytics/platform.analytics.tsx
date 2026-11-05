@@ -140,7 +140,7 @@ export const PlatformAnalytics = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-newBgColorInner p-[20px] flex flex-1 flex-col gap-[15px] transition-all items-center justify-center">
+      <div className="bg-newBgColorInner p-[20px] flex flex-1 flex-col gap-[15px] transition items-center justify-center">
         <LoadingComponent />
       </div>
     );
@@ -148,7 +148,7 @@ export const PlatformAnalytics = () => {
 
   if (!sortedIntegrations.length && !isLoading) {
     return (
-      <div className="bg-newBgColorInner p-[20px] flex flex-col gap-[15px] transition-all flex-1 justify-center items-center text-center">
+      <div className="bg-newBgColorInner p-[20px] flex flex-col gap-[15px] transition flex-1 justify-center items-center text-center">
         <div>
           <img src="/peoplemarketplace.svg" />
         </div>
@@ -177,7 +177,7 @@ export const PlatformAnalytics = () => {
     <>
       <div
         className={clsx(
-          'bg-newBgColorInner p-[20px] mobile:p-[12px] flex flex-col gap-[15px] transition-all mobile:w-full',
+          'bg-newBgColorInner p-[20px] mobile:p-[12px] flex flex-col gap-[15px] transition mobile:w-full',
           collapseMenu === '1' ? 'group sidebar w-[100px]' : 'w-[260px]'
         )}
       >
@@ -188,7 +188,7 @@ export const PlatformAnalytics = () => {
             </h2>
             <div
               onClick={() => setCollapseMenu(collapseMenu === '1' ? '0' : '1')}
-              className="group-[.sidebar]:rotate-[180deg] group-[.sidebar]:mx-auto text-btnText bg-btnSimple rounded-[6px] w-[24px] h-[24px] flex items-center justify-center cursor-pointer select-none"
+              className="group-[.sidebar]:rotate-[180deg] group-[.sidebar]:mx-auto text-btnText bg-btnSimple rounded-pill w-[24px] h-[24px] flex items-center justify-center cursor-pointer select-none"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -120,7 +120,7 @@ const DeleteAccountComponent: FC<{ isLink?: boolean }> = ({ isLink }) => {
       <>
         {loadingOverlay}
         <div
-          className="cursor-pointer flex items-center gap-[8px] text-red-400 hover:text-red-500 text-[14px]"
+          className="cursor-pointer flex items-center gap-[8px] text-error hover:opacity-80 text-[14px]"
           onClick={deleteAccount}
         >
           <TrashIcon size={16} />
@@ -131,7 +131,7 @@ const DeleteAccountComponent: FC<{ isLink?: boolean }> = ({ isLink }) => {
   }
 
   return (
-    <div className="my-[16px] mt-[16px] bg-sixth border-fifth border rounded-[4px] p-[24px] flex flex-col gap-[24px]">
+    <div className="my-[16px] mt-[16px] bg-paper3 rounded-card p-[24px] flex flex-col gap-[24px]">
       {loadingOverlay}
       <div className="mt-[4px]">{t('delete_account', 'Delete Account')}</div>
       <div className="flex items-center justify-between">

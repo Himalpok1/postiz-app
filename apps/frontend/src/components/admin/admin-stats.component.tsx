@@ -228,7 +228,7 @@ export const AdminStatsComponent: FC = () => {
       {isLoading ? (
         <LoadingComponent />
       ) : error || !data ? (
-        <div className="text-red-400">Failed to load stats.</div>
+        <div className="text-error">Failed to load stats.</div>
       ) : (
         <div className="overflow-x-auto pb-[8px] scrollbar scrollbar-thumb-fifth scrollbar-track-newBgColor flex flex-col gap-[16px]">
           <div className="flex gap-[12px]">

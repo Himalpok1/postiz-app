@@ -167,7 +167,7 @@ export const ImportDebugPostModal: FC<{ close: () => void }> = ({ close }) => {
                   <span className="font-[500]">
                     {t('error', 'Error')}:
                   </span>{' '}
-                  <span className="text-red-400">{parsed._debug.error}</span>
+                  <span className="text-error">{parsed._debug.error}</span>
                 </div>
               )}
               {parsed._debug.errors?.length > 0 && (
@@ -202,7 +202,7 @@ export const ImportDebugPostModal: FC<{ close: () => void }> = ({ close }) => {
             </div>
 
             {matchingIntegrations.length === 0 ? (
-              <div className="text-[13px] text-red-400">
+              <div className="text-[13px] text-error">
                 {t(
                   'no_matching_integrations',
                   `No ${parsed._debug.providerIdentifier} integrations found. Add one first.`
@@ -214,7 +214,7 @@ export const ImportDebugPostModal: FC<{ close: () => void }> = ({ close }) => {
                   <div
                     key={integration.id}
                     className={clsx(
-                      'flex items-center gap-[10px] p-[10px] rounded-[8px] border cursor-pointer transition-all',
+                      'flex items-center gap-[10px] p-[10px] rounded-[8px] border cursor-pointer transition',
                       selectedIntegrationId === integration.id
                         ? 'border-forth bg-forth/10'
                         : 'border-tableBorder hover:border-textColor/30'

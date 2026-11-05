@@ -134,19 +134,19 @@ export const PicksSocialsComponent: FC<{
                 <div
                   onClick={toggleIntegration(integration)}
                   className={clsx(
-                    'cursor-pointer border-[2px] relative rounded-full flex justify-center items-center bg-fifth filter transition-all duration-500',
+                    'cursor-pointer border-[2px] relative rounded-full flex justify-center items-center bg-fifth filter transition duration-500',
                     selectedIntegrations.findIndex(
                       (p) => p.integration.id === integration.id
                     ) === -1
                       ? 'grayscale border-transparent'
-                      : 'border-[#622FF6]'
+                      : 'border-accent'
                   )}
                 >
                   <ImageWithFallback
                     fallbackSrc="/no-picture.jpg"
                     src={integration.picture || '/no-picture.jpg'}
                     className={clsx(
-                      'rounded-full transition-all min-w-[42px] border-[1.5px] min-h-[42px]',
+                      'rounded-full transition min-w-[42px] border-[1.5px] min-h-[42px]',
                       selectedIntegrations.findIndex(
                         (p) => p.integration.id === integration.id
                       ) === -1

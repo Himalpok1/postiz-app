@@ -1,4 +1,5 @@
 @use './colors.scss';
+@use './fonts.scss';
 @use '@uppy/core/dist/style.css' as uppyCore;
 @use '@uppy/dashboard/dist/style.css' as uppyDashboard;
 
@@ -10,13 +11,50 @@
   to { transform: rotate(360deg); }
 }
 
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   background: var(--new-bgColor) !important;
   color: var(--new-btn-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  caret-color: var(--color-accent);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-synthesis: none;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 body * {
   outline: none !important;
+}
+
+body *:focus-visible {
+  outline: 2px solid var(--color-focus) !important;
+  outline-offset: 2px;
+}
+
+.dark *:focus-visible {
+  outline-color: var(--new-table-text-focused) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .box {
@@ -40,7 +78,7 @@ body * {
   background: white;
   opacity: 0;
   z-index: 1;
-  transition: all 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 
 .showbox {
@@ -49,7 +87,7 @@ body * {
 .showbox:after {
   @apply bg-textColor;
   opacity: 1;
-  transition: all 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 .table1 {
   width: 100%;
@@ -322,8 +360,8 @@ body * {
 }
 //
 //:root {
-//  --copilot-kit-primary-color: #612ad5 !important;
-//  --copilot-kit-background-color: #0b0f1c !important;
+//  --copilot-kit-primary-color: #2ad5a5 !important;
+//  --copilot-kit-background-color: #0b1c17 !important;
 //  --copilot-kit-separator-color: #1f2941 !important;
 //  --copilot-kit-contrast-color: #ffffff !important;
 //  --copilot-kit-secondary-contrast-color: #ffffff !important;
@@ -402,7 +440,7 @@ body * {
   -webkit-text-fill-color: white !important;
 }
 div div .set-font-family {
-  font-family: 'Helvetica Neue', Helvetica !important;
+  font-family: var(--font-body) !important;
   font-stretch: 100% !important;
   font-style: normal !important;
   font-weight: 400 !important;
@@ -616,7 +654,7 @@ html[dir='rtl'] [dir='ltr'] {
 
 .ProseMirror .mention {
   font-weight: bold;
-  color: #ae8afc;
+  color: #8afcdc;
 }
 
 .ProseMirror img:not(.ProseMirror-separator) {
@@ -704,7 +742,7 @@ html[dir='rtl'] [dir='ltr'] {
 }
 
 .mantine-Overlay-root {
-  background: rgba(65, 64, 66, 0.3) !important;
+  background: var(--popup-color) !important;
 }
 
 .dropdown-menu {
@@ -743,10 +781,10 @@ html[dir='rtl'] [dir='ltr'] {
   }
 
   .mention {
-    background-color: var(--purple-light);
+    background-color: var(--color-accent-soft);
     border-radius: 0.4rem;
     box-decoration-break: clone;
-    color: #ae8afc;
+    color: #8afcdc;
     &::after {
       content: '\200B';
     }
@@ -858,11 +896,6 @@ html[dir='rtl'] [dir='ltr'] {
 .forceChange .changeColor {
   background: var(--new-btn-primary) !important;
   color: #fff !important;
-}
-
-.text-shadow-tags {
-  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black,
-    1px 1px 0 black;
 }
 
 /* Preview page: text that can be selected to leave an inline comment */

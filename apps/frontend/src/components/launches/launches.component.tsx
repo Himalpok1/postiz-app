@@ -5,7 +5,8 @@ import {
   AddProviderButton,
   CustomVariables,
 } from '@gitroom/frontend/components/launches/add.provider.component';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import SafeImage from '@gitroom/react/helpers/safe.image';
 import { capitalize, groupBy, orderBy } from 'lodash';
 import { CalendarWeekProvider } from '@gitroom/frontend/components/launches/calendar.context';
@@ -47,36 +48,8 @@ export const SVGLine = () => {
     >
       <path
         d="M0.5 4C0.5 1.79086 2.29086 0 4.5 0V52C2.29086 52 0.5 50.2091 0.5 48V4Z"
-        fill="url(#paint0_linear_1930_1119)"
+        fill="var(--color-accent)"
       />
-      <path
-        d="M0.5 4C0.5 1.79086 2.29086 0 4.5 0V52C2.29086 52 0.5 50.2091 0.5 48V4Z"
-        fill="url(#paint1_radial_1930_1119)"
-      />
-      <defs>
-        <linearGradient
-          id="paint0_linear_1930_1119"
-          x1="-7"
-          y1="-27.7727"
-          x2="-2.58929"
-          y2="-28.6843"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#662FDA" />
-          <stop offset="1" stopColor="#5720CB" />
-        </linearGradient>
-        <radialGradient
-          id="paint1_radial_1930_1119"
-          cx="0"
-          cy="0"
-          r="1"
-          gradientUnits="userSpaceOnUse"
-          gradientTransform="translate(1.19333 7.45342) rotate(21.2064) scale(16.1503 188.627)"
-        >
-          <stop stopColor="#8C66FF" />
-          <stop offset="1" stopColor="#8C66FF" stopOpacity="0" />
-        </radialGradient>
-      </defs>
     </svg>
   );
 };
@@ -104,7 +77,7 @@ export const OpenClose: FC<{
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={clsx(
-        'rotate-180 transition-all',
+        'rotate-180 transition',
         isOpen ? 'rotate-180' : 'rotate-90'
       )}
     >
@@ -368,7 +341,7 @@ export const MenuComponent: FC<
           }
         : {})}
       className={clsx(
-        'flex gap-[12px] items-center bg-newBgColorInner hover:bg-boxHover group/profile transition-all rounded-e-[8px]',
+        'flex gap-[10px] items-center min-h-[32px] rounded-[10px] group/profile',
         integration.refreshNeeded && 'cursor-pointer'
       )}
     >
@@ -378,45 +351,42 @@ export const MenuComponent: FC<
           integration.disabled && 'opacity-50'
         )}
       >
-        <div className="h-full w-[4px] -ms-[12px] rounded-s-[3px] opacity-0 group-hover/profile:opacity-100 transition-opacity">
-          <SVGLine />
-        </div>
         {(integration.inBetweenSteps || integration.refreshNeeded) && (
           <div
-            className="absolute start-0 top-0 w-[39px] h-[46px] cursor-pointer"
+            className="absolute start-0 top-0 w-[24px] h-[24px] cursor-pointer"
             onClick={
               integration.refreshNeeded
                 ? refreshChannel(integration)
                 : continueIntegration(integration)
             }
           >
-            <div className="bg-red-500 w-[15px] h-[15px] rounded-full start-[5px] top-[5px] absolute z-[200] text-[10px] flex justify-center items-center">
+            <div className="bg-stFailed text-stInk w-[15px] h-[15px] rounded-full start-[5px] top-[5px] absolute z-[200] text-[10px] font-[700] flex justify-center items-center">
               !
             </div>
-            <div className="bg-primary/60 w-[39px] h-[46px] start-0 top-0 absolute rounded-full z-[199]" />
+            <div className="bg-primary/60 w-[24px] h-[24px] start-0 top-0 absolute rounded-[6px] z-[199]" />
           </div>
         )}
         <ImageWithFallback
           fallbackSrc={'/no-picture.jpg'}
           src={integration.picture || '/no-picture.jpg'}
-          className="rounded-[8px] min-w-[36px] min-h-[36px]"
+          className="rounded-[6px] min-w-[24px] min-h-[24px]"
           alt={integration.identifier}
-          width={36}
-          height={36}
+          width={24}
+          height={24}
         />
         {integration.identifier === 'youtube' ? (
           <img
             src="/icons/platforms/youtube.svg"
-            className="absolute z-10 bottom-[5px] -end-[5px]"
-            width={20}
+            className="absolute z-10 -bottom-[3px] -end-[3px]"
+            width={12}
           />
         ) : (
           <SafeImage
             src={`/icons/platforms/${integration.identifier}.png`}
-            className="rounded-[8px] absolute z-10 bottom-[5px] -end-[5px] border border-fifth"
+            className="rounded-[4px] absolute z-10 -bottom-[3px] -end-[3px] border border-fifth"
             alt={integration.identifier}
-            width={18.41}
-            height={18.41}
+            width={12}
+            height={12}
           />
         )}
       </div>
@@ -435,7 +405,7 @@ export const MenuComponent: FC<
           : {})}
         role="Handle"
         className={clsx(
-          'group-[.sidebar]:hidden flex-1 whitespace-nowrap text-ellipsis overflow-hidden cursor-move',
+          'flex-1 min-w-0 text-[14px] font-[500] whitespace-nowrap text-ellipsis overflow-hidden cursor-move',
           integration.disabled && 'opacity-50'
         )}
       >
@@ -468,8 +438,20 @@ export const LaunchesComponent = () => {
   const t = useT();
   const modal = useModals();
   const [reload, setReload] = useState(false);
-  const [collapseMenu, setCollapseMenu] = useCookie('collapseMenu', '0');
   const [channelsOpen, setChannelsOpen] = useState(false);
+  // Create post and the channels live on the rail: it renders them from here
+  // so they keep the calendar's context. On phones they stay a bottom sheet.
+  const [railSlot, setRailSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const onPhone = window.matchMedia('(max-width: 1025px)');
+    const update = () =>
+      setRailSlot(onPhone.matches ? null : document.getElementById('rail-slot'));
+    update();
+    onPhone.addEventListener('change', update);
+    return () => onPhone.removeEventListener('change', update);
+  }, []);
+  const inRail = (content: ReactNode) =>
+    railSlot ? createPortal(content, railSlot) : content;
   const [mode] = useCookie('mode', 'light');
   const { isLoading, data: integrations, mutate } = useIntegrationList();
 
@@ -618,7 +600,7 @@ export const LaunchesComponent = () => {
   }, []);
   if (isLoading || reload) {
     return (
-      <div className="bg-newBgColorInner p-[20px] flex flex-1 flex-col gap-[15px] transition-all items-center justify-center">
+      <div className="bg-newBgColorInner p-[20px] flex flex-1 flex-col gap-[15px] transition items-center justify-center">
         <LoadingComponent />
       </div>
     );
@@ -637,29 +619,28 @@ export const LaunchesComponent = () => {
             onClick={() => setChannelsOpen(false)}
           />
         )}
-        <div
-          className={clsx(
-            'flex relative flex-col',
-            collapseMenu === '1' && !channelsOpen
-              ? 'group sidebar w-[100px]'
-              : 'w-[260px]',
-            channelsOpen
-              ? 'mobile:fixed mobile:inset-x-0 mobile:bottom-0 mobile:z-[150] mobile:w-full mobile:max-h-[80vh] mobile:rounded-t-[16px] mobile:overflow-hidden'
-              : 'mobile:hidden'
-          )}
-        >
+        {inRail(
           <div
             className={clsx(
-              'bg-newBgColorInner p-[20px] flex flex-col gap-[15px] transition-all absolute start-0 top-0 w-full h-full mobile:static mobile:h-auto mobile:max-h-[80vh] mobile:pb-[80px] overflow-x-hidden overflow-y-auto scrollbar scrollbar-thumb-fifth scrollbar-track-newBgColor'
+              'flex flex-col gap-[16px] min-w-0',
+              channelsOpen
+                ? 'mobile:fixed mobile:inset-x-0 mobile:bottom-0 mobile:z-[150] mobile:w-full mobile:max-h-[80vh] mobile:rounded-t-[16px] mobile:overflow-y-auto mobile:bg-newBgColorInner mobile:p-[20px] mobile:pb-[80px]'
+                : 'mobile:hidden'
             )}
           >
-            <div className="flex items-center">
-              <h2 className="group-[.sidebar]:hidden flex-1 text-[20px] font-[500]">
+            <div className="flex flex-col gap-[8px]">
+              <AddProviderButton update={() => update(true)} />
+              <div className="flex gap-[8px] mobile:hidden">
+                {sortedIntegrations?.length > 0 && <NewPost />}
+              </div>
+            </div>
+            <div className="flex items-center px-[8px] mobile:px-0">
+              <h2 className="flex-1 text-[16px] font-[700]">
                 {t('channels')}
               </h2>
               <div
                 onClick={() => setChannelsOpen(false)}
-                className="hidden mobile:flex text-btnText bg-btnSimple rounded-[6px] w-[28px] h-[28px] items-center justify-center cursor-pointer select-none"
+                className="hidden mobile:flex text-btnText bg-btnSimple rounded-pill w-[28px] h-[28px] items-center justify-center cursor-pointer select-none"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -676,38 +657,9 @@ export const LaunchesComponent = () => {
                   />
                 </svg>
               </div>
-              <div
-                onClick={() =>
-                  setCollapseMenu(collapseMenu === '1' ? '0' : '1')
-                }
-                className="group-[.sidebar]:rotate-[180deg] group-[.sidebar]:mx-auto mobile:hidden text-btnText bg-btnSimple rounded-[6px] w-[24px] h-[24px] flex items-center justify-center cursor-pointer select-none"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="7"
-                  height="13"
-                  viewBox="0 0 7 13"
-                  fill="none"
-                >
-                  <path
-                    d="M6 11.5L1 6.5L6 1.5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
             </div>
-            <div className="flex flex-col gap-[8px] group-[.sidebar]:mx-auto group-[.sidebar]:w-[44px]">
-              <AddProviderButton update={() => update(true)} />
-              <div className="flex gap-[8px] group-[.sidebar]:flex-col mobile:hidden">
-                {sortedIntegrations?.length > 0 && <NewPost />}
-              </div>
-            </div>
-            <div className="gap-[32px] flex flex-col select-none flex-1">
-              {sortedIntegrations.length === 0 &&
-                (collapseMenu === '0' || channelsOpen) && (
+            <div className="gap-[16px] flex flex-col select-none flex-1 px-[8px] mobile:px-0">
+              {sortedIntegrations.length === 0 && (
                   <div className="flex-1 max-h-[500px] justify-center items-center flex">
                     <div className="flex flex-col gap-[12px] text-center">
                       <img
@@ -730,7 +682,7 @@ export const LaunchesComponent = () => {
                 )}
               {menuIntegrations.map((menu) => (
                 <MenuGroupComponent
-                  collapsed={collapseMenu === '1' && !channelsOpen}
+                  collapsed={false}
                   changeItemGroup={changeItemGroup}
                   key={menu.name}
                   group={menu}
@@ -742,7 +694,7 @@ export const LaunchesComponent = () => {
                 />
               ))}
             </div>
-            <div className="mt-[5px] text-center flex flex-col mobile:hidden">
+            <div className="text-center flex flex-col text-[12px] mobile:hidden">
               {billingEnabled && user?.isLifetime && (
                 <div>{planDisplayName[user?.tier?.current || '']} tier</div>
               )}
@@ -753,12 +705,12 @@ export const LaunchesComponent = () => {
               </div>
             </div>
           </div>
-        </div>
-        <div className="bg-newBgColorInner flex-1 min-w-0 flex-col flex p-[20px] mobile:p-[12px] gap-[12px] mobile:min-h-[600px]">
+        )}
+        <div className="flex-1 min-w-0 flex-col flex p-[24px] mobile:p-[12px] gap-[12px] mobile:min-h-[600px]">
           <div className="hidden mobile:flex gap-[8px]">
             <div
               onClick={() => setChannelsOpen(true)}
-              className="cursor-pointer h-[44px] px-[12px] bg-btnSimple text-btnText rounded-[8px] flex items-center gap-[8px] select-none"
+              className="cursor-pointer h-[44px] px-[12px] bg-btnSimple text-btnText rounded-pill flex items-center gap-[8px] select-none"
             >
               <div className="flex -space-x-[10px] rtl:space-x-reverse">
                 {sortedIntegrations.slice(0, 3).map((integration: any) => (
@@ -778,7 +730,7 @@ export const LaunchesComponent = () => {
               </div>
             </div>
             {sortedIntegrations?.length > 0 ? (
-              <NewPost />
+              <NewPost openFromLink={true} />
             ) : (
               <div className="flex-1">
                 <AddProviderButton update={() => update(true)} />

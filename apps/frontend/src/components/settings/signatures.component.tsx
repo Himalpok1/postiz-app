@@ -226,7 +226,7 @@ const AddOrRemoveSignature: FC<{
           <div className="relative bg-customColor2">
             <textarea
               className={clsx(
-                'w-full !min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[#612AD5] bg-bigStrip outline-none'
+                'w-full !min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[var(--color-accent)] bg-bigStrip outline-none'
               )}
               value={text}
               onChange={(e) => {

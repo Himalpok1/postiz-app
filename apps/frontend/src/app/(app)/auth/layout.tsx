@@ -13,10 +13,10 @@ export default async function AuthLayout({
   return (
     <MantineWrapper>
       <Toaster />
-      <div className="bg-newBgColor flex flex-1 justify-center p-[12px] min-h-screen w-screen text-textColor">
+      <div className="bg-room flex flex-1 justify-center p-[12px] min-h-screen w-screen text-textColor">
         {/*<style>{`html, body {overflow-x: hidden;}`}</style>*/}
         <ReturnUrlComponent />
-        <div className="flex flex-col py-[40px] px-[20px] flex-1 lg:w-[600px] lg:flex-none rounded-[12px] text-textColor p-[12px] bg-newBgColorInner">
+        <div className="flex flex-col py-[40px] px-[20px] flex-1 lg:w-[600px] lg:flex-none rounded-sheet text-textColor p-[12px] bg-newBgColorInner">
           <div className="w-full max-w-[440px] mx-auto justify-center gap-[20px] h-full flex flex-col">
             <LogoTextComponent />
             <div className="flex">{children}</div>

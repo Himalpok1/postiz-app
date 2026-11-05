@@ -126,7 +126,7 @@ export const SettingsPopup: FC<{
 
   return (
     <>
-      <div className="bg-newBgColorInner p-[20px] mobile:p-[12px] flex flex-col transition-all w-[260px] mobile:w-full">
+      <div className="bg-newBgColorInner p-[20px] mobile:p-[12px] flex flex-col transition w-[260px] mobile:w-full">
         <div className="flex flex-1 flex-col gap-[15px] mobile:flex-row mobile:gap-[8px] mobile:overflow-x-auto mobile:pb-[6px] scrollbar scrollbar-thumb-fifth scrollbar-track-newBgColor">
           {list.map(({ tab: tabKey, label }) => (
             <div
@@ -151,7 +151,7 @@ export const SettingsPopup: FC<{
         </div>
         <div>
           {showLogout && (
-            <div className="mt-4 mobile:mt-[8px]">
+            <div className="mt-4 mobile:hidden">
               <LogoutComponent />
             </div>
           )}
@@ -243,6 +243,12 @@ export const SettingsPopup: FC<{
             </div>
           </form>
         </FormProvider>
+        {/* On phones it sits under the settings, away from the tabs */}
+        {showLogout && (
+          <div className="hidden mobile:block mt-[8px]">
+            <LogoutComponent />
+          </div>
+        )}
       </div>
     </>
   );

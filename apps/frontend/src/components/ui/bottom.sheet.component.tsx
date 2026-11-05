@@ -17,7 +17,7 @@ export const BottomSheetHeader: FC<{
         <div className="flex-1 text-[20px] font-[600]">{title}</div>
         <div
           onClick={onClose}
-          className="w-[32px] h-[32px] flex justify-end items-center cursor-pointer text-[#A3A3A3]"
+          className="w-[32px] h-[32px] flex justify-end items-center cursor-pointer text-muted"
         >
           <CloseIcon />
         </div>
@@ -36,7 +36,7 @@ export const BottomSheetButton: FC<{
       <button
         disabled={disabled}
         onClick={onClick}
-        className="w-full h-[44px] rounded-[8px] bg-btnPrimary text-white text-[15px] font-[600] disabled:bg-btnSimple disabled:text-textItemBlur"
+        className="w-full h-[44px] rounded-pill bg-btnPrimary text-white text-[15px] font-[600] disabled:bg-btnSimple disabled:text-textItemBlur"
       >
         {label}
       </button>
@@ -87,9 +87,9 @@ export const BottomSheetRow: FC<{
       onClick={onClick}
       className="flex items-center gap-[12px] py-[8px] cursor-pointer select-none"
     >
-      <div className="text-[#A3A3A3]">{icon}</div>
+      <div className="text-muted">{icon}</div>
       <div className="flex-1 text-[15px] font-[600]">{label}</div>
-      <ChevronRightIcon size={20} className="text-[#A3A3A3] rtl:rotate-180" />
+      <ChevronRightIcon size={20} className="text-muted rtl:rotate-180" />
     </div>
   );
 };

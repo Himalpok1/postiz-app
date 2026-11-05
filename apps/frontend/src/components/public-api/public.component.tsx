@@ -246,7 +246,7 @@ export const CopyButton = ({
         copy(text);
         toaster.show(`${label} copied to clipboard`, 'success');
       }}
-      className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-[8px] text-[13px] font-[600] flex items-center gap-[6px]"
+      className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-pill text-[13px] font-[600] flex items-center gap-[6px]"
     >
       <svg
         width="14"
@@ -324,7 +324,7 @@ const McpSection = ({
                 className={clsx(
                   'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors',
                   auth === m
-                    ? 'bg-[#612BD3] text-white'
+                    ? 'bg-accent text-white'
                     : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
                 )}
                 onClick={() => setAuth(m)}
@@ -348,7 +348,7 @@ const McpSection = ({
                 className={clsx(
                   'cursor-pointer px-[14px] h-[36px] text-[13px] font-[500] rounded-[8px] transition-colors flex items-center gap-[8px]',
                   activeClient === client
-                    ? 'bg-[#612BD3] text-white'
+                    ? 'bg-accent text-white'
                     : 'bg-btnSimple text-customColor18 hover:bg-boxHover hover:text-textColor'
                 )}
                 onClick={() =>
@@ -378,7 +378,7 @@ const McpSection = ({
               <button
                 type="button"
                 onClick={() => setRevealed(!revealed)}
-                className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-[8px] text-[13px] font-[600] flex items-center gap-[6px]"
+                className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-pill text-[13px] font-[600] flex items-center gap-[6px]"
               >
                 <svg
                   width="14"
@@ -509,7 +509,7 @@ const PublicApiContent = () => {
             <button
               type="button"
               onClick={() => setReveal(!reveal)}
-              className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-[8px] text-[13px] font-[600] flex items-center gap-[6px]"
+              className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-pill text-[13px] font-[600] flex items-center gap-[6px]"
             >
               <svg
                 width="14"
@@ -540,7 +540,7 @@ const PublicApiContent = () => {
             <button
               type="button"
               onClick={rotateKey}
-              className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-[8px] text-[13px] font-[600] flex items-center gap-[6px]"
+              className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-pill text-[13px] font-[600] flex items-center gap-[6px]"
             >
               <svg
                 width="14"
@@ -567,7 +567,7 @@ const PublicApiContent = () => {
               onClick={() =>
                 window.open(`${frontEndUrl}/modal/dark/all`, '_blank')
               }
-              className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-[8px] text-[13px] font-[600] flex items-center gap-[6px]"
+              className="cursor-pointer px-[16px] h-[36px] bg-btnSimple hover:bg-boxHover transition-colors rounded-pill text-[13px] font-[600] flex items-center gap-[6px]"
             >
               <svg
                 width="14"

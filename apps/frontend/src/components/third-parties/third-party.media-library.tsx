@@ -119,7 +119,7 @@ const ThirdPartyMediaLibraryBrowser: FC<{
                       className={clsx(
                         'w-full h-full border-[4px] rounded-[6px]',
                         isSelected
-                          ? 'border-[#612BD3]'
+                          ? 'border-accent'
                           : 'border-transparent'
                       )}
                     >
@@ -134,7 +134,7 @@ const ThirdPartyMediaLibraryBrowser: FC<{
                       )}
                     </div>
                     {isSelected && (
-                      <div className="text-white flex z-[10] justify-center items-center text-[14px] font-[500] w-[24px] h-[24px] rounded-full bg-[#612BD3] absolute -bottom-[2px] -end-[2px]">
+                      <div className="text-white flex z-[10] justify-center items-center text-[14px] font-[500] w-[24px] h-[24px] rounded-full bg-accent absolute -bottom-[2px] -end-[2px]">
                         {selected.findIndex((s) => s.id === item.id) + 1}
                       </div>
                     )}
@@ -167,7 +167,7 @@ const ThirdPartyMediaLibraryBrowser: FC<{
         <button
           onClick={importSelected}
           disabled={!selected.length || importing}
-          className="cursor-pointer text-white disabled:opacity-80 disabled:cursor-not-allowed h-[52px] px-[20px] items-center justify-center bg-[#612BD3] flex rounded-[10px] gap-[8px]"
+          className="cursor-pointer text-white disabled:opacity-80 disabled:cursor-not-allowed h-[52px] px-[20px] items-center justify-center bg-accent flex rounded-pill gap-[8px]"
         >
           {importing && (
             <div className="animate-spin h-[16px] w-[16px] border-2 border-white border-t-transparent rounded-full" />
@@ -209,7 +209,7 @@ const ThirdPartyMediaLibraryPicker: FC<{
         <div
           key={p.id}
           onClick={() => setSelected(p)}
-          className="w-full h-full p-[20px] min-h-[100px] text-[14px] bg-newTableHeader hover:bg-newTableBorder rounded-[8px] transition-all text-textColor relative flex flex-col gap-[15px] cursor-pointer"
+          className="w-full h-full p-[20px] min-h-[100px] text-[14px] bg-newTableHeader hover:bg-newTableBorder rounded-[8px] transition text-textColor relative flex flex-col gap-[15px] cursor-pointer"
         >
           <div>
             <img
@@ -271,7 +271,7 @@ export const ThirdPartyMediaLibrary: FC<{
           ),
         });
       }}
-      className="cursor-pointer bg-btnSimple changeColor flex gap-[8px] h-[44px] px-[18px] justify-center items-center rounded-[8px]"
+      className="cursor-pointer bg-btnSimple changeColor flex gap-[8px] h-[44px] px-[18px] justify-center items-center rounded-pill"
     >
       <svg
         width="14"

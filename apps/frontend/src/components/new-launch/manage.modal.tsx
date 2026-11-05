@@ -882,7 +882,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
   const settingsButton = !dummy && (
     <div
       onClick={() => setMobileSheet('settings')}
-      className="hidden mobile:flex shrink-0 w-[32px] h-[44px] justify-end items-center cursor-pointer text-[#A3A3A3]"
+      className="hidden mobile:flex shrink-0 w-[32px] h-[44px] justify-end items-center cursor-pointer text-muted"
     >
       <SettingsOutlineIcon />
     </div>
@@ -894,7 +894,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
       onClick={() => setMobileTab(mobileTab === 'preview' ? 'edit' : 'preview')}
       className={clsx(
         'hidden mobile:flex shrink-0 w-[32px] h-[44px] justify-end items-center cursor-pointer',
-        mobileTab === 'preview' ? 'text-[#FC69FF]' : 'text-[#A3A3A3]'
+        mobileTab === 'preview' ? 'text-accent' : 'text-muted'
       )}
     >
       <EyeIcon />
@@ -927,7 +927,9 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             )}
           >
             <div className="bg-newBgColor h-[65px] rounded-s-[20px] !rounded-b-[0] mobile:hidden flex items-center gap-[12px] px-[20px] text-[20px] font-[600]">
-              {t('create_post_title', 'Create Post')}
+              {!existingData?.integration
+                ? t('create_post_title', 'Create Post')
+                : t('edit_post_title', 'Edit Post')}
               <CreationMethodBadge
                 creationMethod={existingData?.posts?.[0]?.creationMethod}
                 size="sm"
@@ -988,7 +990,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                         <>
                           <div
                             onClick={() => setMobileSheet('channels')}
-                            className="hidden mobile:flex shrink-0 w-[44px] h-[44px] rounded-[8px] bg-btnSimple justify-center items-center cursor-pointer"
+                            className="hidden mobile:flex shrink-0 w-[44px] h-[44px] rounded-pill bg-btnSimple justify-center items-center cursor-pointer"
                           >
                             <PlusIcon size={24} />
                           </div>
@@ -1045,7 +1047,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                     <div
                       onClick={() => setShowSettings(!showSettings)}
                       className={clsx(
-                        'bg-[#612BD3] rounded-[12px] flex items-center gap-[8px] cursor-pointer p-[12px] mobile:hidden',
+                        'bg-accent rounded-pill flex items-center gap-[8px] cursor-pointer p-[12px] mobile:hidden',
                         showSettings ? '!rounded-b-none' : ''
                       )}
                     >
@@ -1096,7 +1098,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             <div className="bg-newBgColor h-[65px] rounded-e-[20px] !rounded-b-[0] mobile:hidden flex items-center px-[20px] text-[20px] font-[600]">
               <div className="flex-1">{t('post_preview', 'Post Preview')}</div>
               <div className="cursor-pointer mobile:hidden">
-                <CloseIcon onClick={askClose} className="text-[#A3A3A3]" />
+                <CloseIcon onClick={askClose} className="text-muted" />
               </div>
             </div>
             <div className="flex-1 relative">
@@ -1131,7 +1133,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             {existingData?.integration && (
               <button
                 onClick={deletePost}
-                className="cursor-pointer flex text-[#FF3F3F] gap-[8px] items-center text-[15px] font-[600]"
+                className="cursor-pointer flex text-error gap-[8px] items-center text-[15px] font-[600]"
               >
                 <div>
                   <TrashIcon />
@@ -1146,7 +1148,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                   selectedIntegrations.length === 0 || loading || locked
                 }
                 onClick={schedule('draft')}
-                className="relative cursor-pointer disabled:cursor-not-allowed px-[20px] h-[44px] bg-btnSimple justify-center items-center flex rounded-[8px] text-[15px] font-[600]"
+                className="relative cursor-pointer disabled:cursor-not-allowed px-[20px] h-[44px] bg-btnSimple justify-center items-center flex rounded-pill text-[15px] font-[600]"
               >
                 {loading && (
                   <div className="absolute left-[50%] top-[50%] -translate-y-[50%] -translate-x-[50%]">
@@ -1160,7 +1162,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             )}
             {addEditSets && (
               <button
-                className="text-white text-[15px] font-[600] min-w-[180px] btnSub disabled:cursor-not-allowed disabled:opacity-80 outline-none gap-[8px] flex justify-center items-center h-[44px] rounded-[8px] bg-[#612BD3] ps-[20px] pe-[16px]"
+                className="text-white text-[15px] font-[600] min-w-[180px] btnSub disabled:cursor-not-allowed disabled:opacity-80 outline-none gap-[8px] flex justify-center items-center h-[44px] rounded-pill bg-accent ps-[20px] pe-[16px]"
                 disabled={
                   selectedIntegrations.length === 0 || loading || locked
                 }
@@ -1176,7 +1178,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                     selectedIntegrations.length === 0 || loading || locked
                   }
                   onClick={schedule('schedule')}
-                  className="text-white relative min-w-[180px] btnSub disabled:cursor-not-allowed disabled:opacity-80 outline-none gap-[8px] flex justify-center items-center h-[44px] rounded-[8px] bg-[#612BD3] ps-[20px] pe-[16px]"
+                  className="text-white relative min-w-[180px] btnSub disabled:cursor-not-allowed disabled:opacity-80 outline-none gap-[8px] flex justify-center items-center h-[44px] rounded-pill bg-accent ps-[20px] pe-[16px]"
                 >
                   {loading && (
                     <div className="absolute left-[50%] top-[50%] -translate-y-[50%] -translate-x-[50%]">
@@ -1190,7 +1192,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                     )}
                   >
                     {selectedIntegrations.length === 0
-                      ? t('check_circles_above', 'Check the circles above')
+                      ? t('check_circles_above', 'Select a channel above')
                       : scheduleLabel}
                   </div>
                   {!dummy && (
@@ -1222,7 +1224,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
                       showPostNow ? 'flex' : 'hidden group-hover:flex'
                     )}
                   >
-                    <div className="text-white rounded-[8px] bg-[#D82D7E] h-[44px] w-full flex justify-center items-center post-now">
+                    <div className="text-white rounded-pill bg-accent h-[44px] w-full flex justify-center items-center post-now">
                       {t('post_now', 'Post Now')}
                     </div>
                   </button>
@@ -1289,7 +1291,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             {existingData?.integration && (
               <div
                 onClick={deletePost}
-                className="flex items-center gap-[12px] py-[8px] cursor-pointer text-[#FF3F3F]"
+                className="flex items-center gap-[12px] py-[8px] cursor-pointer text-error"
               >
                 <TrashIcon size={24} />
                 <div className="text-[15px] font-[600]">

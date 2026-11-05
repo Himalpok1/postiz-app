@@ -195,7 +195,7 @@ export const InformationComponent: FC<{
       {isValid ? (
         <Valid />
       ) : (
-        <Invalid className="text-white mobile:text-[#FF3F3F]" />
+        <Invalid className="text-white mobile:text-error" />
       )}
 
       {!isGlobal && (
@@ -204,7 +204,7 @@ export const InformationComponent: FC<{
             'text-[10px] mobile:text-[12px] font-[600] mobile:font-[500] flex justify-center items-center',
             isValid
               ? 'mobile:text-newTextColor/40'
-              : 'text-white mobile:text-[#FF3F3F]'
+              : 'text-white mobile:text-error'
           )}
         >
           {currentChars}/{totalAllowedChars}
@@ -216,7 +216,7 @@ export const InformationComponent: FC<{
             'text-[10px] mobile:text-[12px] font-[600] mobile:font-[500] flex justify-center items-center',
             isValid
               ? 'mobile:text-newTextColor/40'
-              : 'text-white mobile:text-[#FF3F3F]'
+              : 'text-white mobile:text-error'
           )}
         >
           {globalDisplayLimit.count}/{globalDisplayLimit.limit}
@@ -228,7 +228,7 @@ export const InformationComponent: FC<{
             'group-hover:rotate-180',
             isValid
               ? 'mobile:text-newTextColor/40'
-              : 'text-white mobile:text-[#FF3F3F]'
+              : 'text-white mobile:text-error'
           )}
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -252,7 +252,7 @@ export const InformationComponent: FC<{
           {!isPicture && !totalChars && (
             <div
               className={clsx(
-                'text-sm text-[#FF3F3F] whitespace-nowrap',
+                'text-sm text-error whitespace-nowrap',
                 isGlobal && selectedIntegrations.length && 'mb-[12px]'
               )}
             >
@@ -279,7 +279,7 @@ export const InformationComponent: FC<{
                         ? ''
                         : countFor(p.integration.identifier) >
                           (chars?.[p.integration.id] || 0)
-                        ? 'text-[#FF3F3F]'
+                        ? 'text-error'
                         : ''
                     )}
                   >
@@ -293,7 +293,7 @@ export const InformationComponent: FC<{
                         ? ''
                         : countFor(p.integration.identifier) >
                           (chars?.[p.integration.id] || 0)
-                        ? 'text-[#FF3F3F]'
+                        ? 'text-error'
                         : ''
                     )}
                   >
@@ -310,7 +310,7 @@ export const InformationComponent: FC<{
           {showStripLinkWarning && (
             <div
               className={clsx(
-                'text-sm text-[#FF3F3F] whitespace-nowrap',
+                'text-sm text-error whitespace-nowrap',
                 ((isGlobal && selectedIntegrations.length) ||
                   (!isPicture && !totalChars)) &&
                   'mt-[12px]'

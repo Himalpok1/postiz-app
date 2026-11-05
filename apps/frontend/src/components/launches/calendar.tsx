@@ -1,6 +1,7 @@
 'use client';
 
 import React, {
+  ReactNode,
   FC,
   Fragment,
   memo,
@@ -51,6 +52,7 @@ import { MissingReleaseModal } from '@gitroom/frontend/components/launches/missi
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
 import i18next from 'i18next';
 import { AddEditModal } from '@gitroom/frontend/components/new-launch/add.edit.modal';
+import { readableOn } from '@gitroom/frontend/components/launches/tags.component';
 import { CreationMethodBadge } from '@gitroom/frontend/components/launches/creation.method.badge';
 import { deleteDialog } from '@gitroom/react/helpers/delete.dialog';
 import { useVariables } from '@gitroom/react/helpers/variable.context';
@@ -99,7 +101,7 @@ export const hours = Array.from(
 
 // The current time badge at the start of the now line
 const NowTime: FC<{ time: string }> = ({ time }) => (
-  <div className="rounded-[6px] bg-newTableTextFocused px-[6px] text-[12px] leading-[20px] font-[500] text-black whitespace-nowrap">
+  <div className="rounded-pill bg-accent px-[6px] text-[12px] leading-[20px] font-[500] text-accentInk whitespace-nowrap">
     {time}
   </div>
 );
@@ -531,6 +533,8 @@ export const WeekView = () => {
       const day = weekStart.add(i, 'day');
       days.push({
         name: day.format('dddd'),
+        short: day.format('ddd'),
+        dayNumber: day.format('D'),
         day: day.format('L'),
         date: day,
       });
@@ -542,26 +546,20 @@ export const WeekView = () => {
     <div className="flex flex-col text-textColor flex-1">
       <div className="flex-1 relative">
         <div className="grid [grid-template-columns:136px_repeat(7,_minmax(0,_1fr))] tablet:[grid-template-columns:72px_repeat(7,_minmax(100px,_1fr))] gap-[4px] rounded-[10px] absolute h-full start-0 top-0 w-full overflow-auto scrollbar scrollbar-thumb-fifth scrollbar-track-newBgColor">
-          <div className="z-10 bg-newTableHeader flex justify-center items-center flex-col h-[62px] rounded-[8px] sticky top-0"></div>
+          <div className="z-10 bg-newBgColorInner flex justify-center items-center flex-col h-[48px] sticky top-0"></div>
           {localizedDays.map((day, index) => (
             <div
               key={day.name}
-              className="p-2 text-center bg-newTableHeader flex justify-center items-center flex-col h-[62px] rounded-[8px] sticky top-0 z-[20]"
+              className="bg-newBgColorInner flex justify-center items-center h-[48px] sticky top-0 z-[20]"
             >
-              <div className="text-[14px] font-[500] text-newTableText">
-                {day.name}
-              </div>
               <div
                 className={clsx(
-                  'text-[14px] font-[600] flex items-center justify-center gap-[6px]',
-                  day.day === newDayjs().format('L') &&
-                    'text-newTableTextFocused'
+                  'flex items-center justify-center gap-[6px] h-[32px] px-[12px] rounded-pill text-[14px] font-[600] whitespace-nowrap',
+                  day.day === newDayjs().format('L') && 'bg-room text-ink'
                 )}
               >
-                {day.day === newDayjs().format('L') && (
-                  <div className="w-[6px] h-[6px] bg-newTableTextFocused rounded-full" />
-                )}
-                {day.day}
+                {day.short}
+                <span className="font-[500]">{day.dayNumber}</span>
               </div>
             </div>
           ))}
@@ -648,7 +646,7 @@ export const MonthView = () => {
           {localizedDays.map((day) => (
             <div
               key={day.name}
-              className="z-[20] p-2 mobile:p-0 bg-newTableHeader flex justify-center items-center flex-col h-[62px] mobile:h-[36px] rounded-[8px] sticky top-0"
+              className="z-[20] p-2 mobile:p-0 bg-newBgColorInner font-[600] flex justify-center items-center flex-col h-[48px] mobile:h-[36px] sticky top-0"
             >
               <div className="mobile:hidden">{day.name}</div>
               <div className="hidden mobile:block text-[13px]">{day.short}</div>
@@ -1010,7 +1008,7 @@ export const CalendarColumn: FC<{
       className={clsx(
         'flex flex-col w-full min-h-full relative',
         isBeforeNow && 'repeated-strip',
-        loading && 'animate-pulse',
+        loading && 'animate-pulse motion-reduce:animate-none',
         isBeforeNow
           ? 'cursor-not-allowed'
           : 'border border-newTextColor/5 rounded-[8px]'
@@ -1028,7 +1026,7 @@ export const CalendarColumn: FC<{
             className={clsx(
               'h-[24px] min-w-[24px] px-[5px] mobile:h-[20px] mobile:min-w-[20px] mobile:px-[4px] rounded-[6px] flex items-center justify-center',
               getDate.isSame(currentHour, 'day') &&
-                'bg-newTableTextFocused text-black font-[600]'
+                'bg-room text-ink font-[600]'
             )}
           >
             {getDate.date()}
@@ -1039,7 +1037,7 @@ export const CalendarColumn: FC<{
         className={clsx(
           'relative flex flex-col flex-1 text-white rounded-[8px] min-h-[70px]',
           display === 'month' && 'mobile:min-h-[44px]',
-          canDrop && 'border border-[#612BD3]'
+          canDrop && 'border border-accent'
         )}
       >
         <div
@@ -1139,7 +1137,7 @@ export const CalendarColumn: FC<{
                 >
                   {/* z-[16]: above the now line (z-[15]), under the sticky day headers (z-[20]) */}
                   <div
-                    className={`group-hover:before:content-["+"] pb-[5px] flex justify-center items-center rounded-[8px] transition-all group-hover:bg-btnPrimary w-full h-full max-w-[40px] max-h-[40px] relative z-[16]`}
+                    className={`group-hover:before:content-["+"] pb-[5px] flex justify-center items-center rounded-pill transition group-hover:bg-btnPrimary w-full h-full max-w-[40px] max-h-[40px] relative z-[16]`}
                   />
                 </div>
               )}
@@ -1154,7 +1152,7 @@ export const CalendarColumn: FC<{
                     >
                       <div
                         className={clsx(
-                          'relative w-[34px] h-[34px] rounded-[8px] flex justify-center items-center filter transition-all duration-500'
+                          'relative w-[34px] h-[34px] rounded-[8px] flex justify-center items-center filter transition duration-500'
                         )}
                       >
                         <SafeImage
@@ -1193,6 +1191,65 @@ export const CalendarColumn: FC<{
     </div>
   );
 });
+const statusIcon = (path: ReactNode) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    {path}
+  </svg>
+);
+
+const statusBadge: Record<
+  string,
+  { key: string; label: string; className: string; icon: ReactNode }
+> = {
+  DRAFT: {
+    key: 'draft',
+    label: 'Draft',
+    className: 'bg-stDraft',
+    icon: statusIcon(
+      <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    ),
+  },
+  QUEUE: {
+    key: 'scheduled',
+    label: 'Scheduled',
+    className: 'bg-stScheduled',
+    icon: statusIcon(
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </>
+    ),
+  },
+  PUBLISHED: {
+    key: 'published',
+    label: 'Published',
+    className: 'bg-stPublished',
+    icon: statusIcon(<path d="M20 6 9 17l-5-5" />),
+  },
+  ERROR: {
+    key: 'failed',
+    label: 'Failed',
+    className: 'bg-stFailed',
+    icon: statusIcon(
+      <>
+        <path d="M12 3 2 21h20Z" />
+        <path d="M12 10v5M12 18h.01" />
+      </>
+    ),
+  },
+};
+
 const CalendarItem: FC<{
   date: dayjs.Dayjs;
   isBeforeNow: boolean;
@@ -1253,43 +1310,19 @@ const CalendarItem: FC<{
     }),
     []
   );
+  const tagColor = post?.tags?.[0]?.tag?.color;
+  const status = statusBadge[state];
+  const actionClass =
+    'flex hover:text-accent cursor-pointer';
   return (
     <div
       // @ts-ignore
       ref={dragRef}
-      className={clsx(
-        'w-full flex h-full flex-1 flex-col group',
-        'relative',
-        state === 'ERROR' && 'rounded-[10px] ring-2 ring-red-500',
-        state === 'PUBLISHED' && 'rounded-[10px] ring-2 ring-green-500'
-      )}
+      className="w-full flex h-full flex-1 flex-col group relative rounded-[10px] bg-newColColor"
       style={{
         opacity,
       }}
     >
-      {state === 'ERROR' && (
-        <div
-          className={clsx(
-            'absolute -top-[6px] -start-[6px] z-20 w-[18px] h-[18px] rounded-full bg-red-500 flex items-center justify-center text-white text-[11px] font-bold cursor-pointer',
-            display === 'month' && 'mobile:hidden'
-          )}
-          data-tooltip-id="tooltip"
-          data-tooltip-class-name="!max-w-[400px] break-words"
-          data-tooltip-content={post.error || 'An error occurred while publishing this post'}
-        >
-          !
-        </div>
-      )}
-      {state === 'PUBLISHED' && (
-        <div
-          className={clsx(
-            'absolute -top-[6px] -start-[6px] z-20 w-[18px] h-[18px] rounded-full bg-green-500 flex items-center justify-center text-white text-[11px] font-bold',
-            display === 'month' && 'mobile:hidden'
-          )}
-        >
-          ✓
-        </div>
-      )}
       {showCreationMethodBadge && (
         <div className="absolute -bottom-[4px] -right-[4px] z-10">
           <CreationMethodBadge
@@ -1298,140 +1331,134 @@ const CalendarItem: FC<{
           />
         </div>
       )}
-      <div
-        className={clsx(
-          'text-white text-[11px] max-h-[24px] h-[24px] min-h-[24px] w-full rounded-tr-[10px] rounded-tl-[10px] flex items-center justify-center gap-[6px] px-[5px] bg-btnPrimary',
-          display === 'month' && 'mobile:hidden'
-        )}
-        style={{
-          backgroundColor: post?.tags?.[0]?.tag?.color,
-        }}
-      >
+      {post.tags.length > 0 && (
         <div
           className={clsx(
-            post?.tags?.[0]?.tag?.color ? 'text-shadow-tags' : '',
-            'group-hover:hidden cursor-pointer'
-          )}
-        >
-          {post.tags.map((p) => p.tag.name).join(', ')}
-        </div>
-        {copyDebugJson && (
-          <div
-            className={clsx(
-              'hidden group-hover:block hover:underline cursor-pointer',
-              post?.tags?.[0]?.tag?.color && 'text-shadow-tags'
-            )}
-            onClick={copyDebugJson}
-          >
-            <CopyDebug />
-          </div>
-        )}
-        {(state === 'PUBLISHED' || state === 'ERROR') &&
-          !post.intervalInDays &&
-          post.releaseURL?.startsWith('http') && (
-            <div
-              className={clsx(
-                'hidden group-hover:block hover:underline cursor-pointer',
-                post?.tags?.[0]?.tag?.color && 'mix-blend-difference'
-              )}
-              onClick={openPost}
-            >
-              <OpenPost />
-            </div>
-          )}{' '}
-        {((post.integration.providerIdentifier === 'x' && disableXAnalytics) || !post.releaseId) ? (
-          <></>
-        ) : post.releaseId === 'missing' && missingRelease ? (
-          <div
-            className={clsx(
-              'hidden group-hover:block hover:underline cursor-pointer',
-              post?.tags?.[0]?.tag?.color && 'text-shadow-tags'
-            )}
-            onClick={missingRelease}
-          >
-            <Statistics />
-          </div>
-        ) : post.releaseId !== 'missing' ? (
-          <div
-            className={clsx(
-              'hidden group-hover:block hover:underline cursor-pointer',
-              post?.tags?.[0]?.tag?.color && 'text-shadow-tags'
-            )}
-            onClick={statistics}
-          >
-            <Statistics />
-          </div>
-        ) : (
-          <></>
-        )}{' '}
-        <div
-          className={clsx(
-            'hidden group-hover:block hover:underline cursor-pointer',
-            post?.tags?.[0]?.tag?.color && 'text-shadow-tags'
-          )}
-          onClick={preview}
-        >
-          <Preview />
-        </div>
-        <div
-          className={clsx(
-            'hidden group-hover:block hover:underline cursor-pointer',
-            post?.tags?.[0]?.tag?.color && 'text-shadow-tags'
-          )}
-          onClick={duplicatePost}
-        >
-          <Duplicate />
-        </div>
-        <div
-          className={clsx(
-            'hidden group-hover:block hover:underline cursor-pointer text-red-500',
-            post?.tags?.[0]?.tag?.color && 'text-shadow-tags'
-          )}
-          onClick={deletePost}
-        >
-          <DeletePost />
-        </div>
-      </div>
-      <div
-        onClick={editPost}
-        className={clsx(
-          'gap-[5px] w-full flex h-full flex-1 rounded-br-[10px] rounded-bl-[10px] p-[8px] text-[14px] bg-newColColor',
-          'relative',
-          display === 'month' &&
-            'mobile:p-[4px] mobile:rounded-[10px] mobile:justify-center',
-          isBeforeNow && '!grayscale'
-        )}
-      >
-        <div className={clsx('relative min-w-[20px]')}>
-          <img
-            className="w-[20px] h-[20px] rounded-[8px]"
-            src={post.integration.picture! || '/no-picture.jpg'}
-          />
-          <img
-            className="w-[12px] h-[12px] rounded-[8px] absolute z-10 top-[10px] end-0 border border-fifth"
-            src={`/icons/platforms/${post.integration?.providerIdentifier}.png`}
-          />
-        </div>
-        <div
-          className={clsx(
-            'w-full flex-1 flex flex-col min-h-[40px]',
+            'px-[8px] pt-[8px] flex text-[11px] font-[600]',
             display === 'month' && 'mobile:hidden'
           )}
         >
-          <div className="text-start">
-            {state === 'DRAFT' ? t('draft', 'Draft') + ': ' : ''}
+          <div
+            className="px-[6px] rounded-[6px] truncate min-w-0"
+            style={{
+              backgroundColor: tagColor,
+              color: readableOn(tagColor),
+            }}
+          >
+            {post.tags.map((p) => p.tag.name).join(', ')}
           </div>
-            <div className="w-full relative">
-              <div className="absolute top-0 start-0 w-full text-ellipsis break-words line-clamp-1 text-start">
-                {stripHtmlValidation('none', post.content, false, true, false) ||
-                  t('no_content', 'no content')}
-              </div>
-            </div>
         </div>
-        {showTime && (
-          <div className="text-textColor/50 text-[12px] whitespace-nowrap flex items-center">
-            {fromUtc(post.publishDate).format(isUSCitizen() ? 'hh:mm A' : 'HH:mm')}
+      )}
+      <div
+        onClick={editPost}
+        className={clsx(
+          'flex flex-col gap-[6px] w-full h-full flex-1 p-[8px] text-[13px] leading-[1.3] font-[500] cursor-pointer',
+          display === 'month' &&
+            'mobile:p-[4px] mobile:rounded-[10px] mobile:items-center mobile:justify-center'
+        )}
+      >
+        <div className="flex items-center gap-[6px] min-h-[20px]">
+          <div className={clsx('relative min-w-[20px]')}>
+            <img
+              className="w-[20px] h-[20px] rounded-[6px]"
+              src={post.integration.picture! || '/no-picture.jpg'}
+            />
+            <img
+              className="w-[12px] h-[12px] rounded-[4px] absolute z-10 top-[10px] -end-[3px] border border-fifth"
+              src={`/icons/platforms/${post.integration?.providerIdentifier}.png`}
+            />
           </div>
+          {showTime && (
+            <div className="text-textColor/70 text-[12px] whitespace-nowrap">
+              {fromUtc(post.publishDate).format(
+                isUSCitizen() ? 'hh:mm A' : 'HH:mm'
+              )}
+            </div>
+          )}
+          <div
+            data-tooltip-id={state === 'ERROR' ? 'tooltip' : undefined}
+            data-tooltip-class-name="!max-w-[400px] break-words"
+            data-tooltip-content={
+              state === 'ERROR'
+                ? post.error || 'An error occurred while publishing this post'
+                : undefined
+            }
+            className={clsx(
+              'ms-auto shrink-0 flex items-center gap-[3px] ps-[4px] pe-[6px] rounded-pill text-stInk text-[11px] font-[600]',
+              status.className,
+              display === 'month' && 'mobile:hidden'
+            )}
+          >
+            {status.icon}
+            {t(status.key, status.label)}
+          </div>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={clsx(
+              'absolute top-[4px] end-[4px] z-[30] hidden group-hover:flex group-focus-within:flex items-center gap-[4px] h-[26px] px-[6px] rounded-pill bg-paper2 shadow-menu text-newTextColor',
+              display === 'month' && 'mobile:!hidden'
+            )}
+          >
+            {copyDebugJson && (
+              <div className={actionClass} onClick={copyDebugJson}>
+                <CopyDebug />
+              </div>
+            )}
+            {(state === 'PUBLISHED' || state === 'ERROR') &&
+              !post.intervalInDays &&
+              post.releaseURL?.startsWith('http') && (
+                <div className={actionClass} onClick={openPost}>
+                  <OpenPost />
+                </div>
+              )}
+            {(post.integration.providerIdentifier === 'x' &&
+              disableXAnalytics) ||
+            !post.releaseId ? (
+              <></>
+            ) : post.releaseId === 'missing' && missingRelease ? (
+              <div className={actionClass} onClick={missingRelease}>
+                <Statistics />
+              </div>
+            ) : post.releaseId !== 'missing' ? (
+              <div className={actionClass} onClick={statistics}>
+                <Statistics />
+              </div>
+            ) : (
+              <></>
+            )}
+            <div className={actionClass} onClick={preview}>
+              <Preview />
+            </div>
+            <div className={actionClass} onClick={duplicatePost}>
+              <Duplicate />
+            </div>
+            <div
+              className={clsx(actionClass, 'text-error')}
+              onClick={deletePost}
+            >
+              <DeletePost />
+            </div>
+          </div>
+        </div>
+        <div
+          className={clsx(
+            'w-full text-start line-clamp-2 break-words',
+            display === 'month' && 'mobile:hidden'
+          )}
+        >
+          {stripHtmlValidation('none', post.content, false, true, false) ||
+            t('no_content', 'no content')}
+        </div>
+        {state === 'ERROR' && (
+          <button
+            type="button"
+            className={clsx(
+              'self-start h-[24px] px-[10px] rounded-pill bg-btnPrimary text-accentInk text-[11px] font-[600] hover:bg-accentHover transition-colors duration-[120ms]',
+              display === 'month' && 'mobile:hidden'
+            )}
+          >
+            {t('fix_post', 'Fix')}
+          </button>
         )}
       </div>
     </div>
@@ -1491,6 +1518,7 @@ const CopyDebug = () => {
   const t = useT();
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       width="15"
       height="15"
@@ -1512,6 +1540,7 @@ const Duplicate = () => {
   const t = useT();
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       width="15"
       height="15"
@@ -1531,6 +1560,7 @@ const Preview = () => {
   const t = useT();
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       width="15"
       height="15"
@@ -1550,6 +1580,7 @@ const OpenPost = () => {
   const t = useT();
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       width="15"
       height="15"
@@ -1569,6 +1600,7 @@ export const Statistics = () => {
   const t = useT();
   return (
     <svg
+      aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       width="15"
       height="15"
@@ -1589,6 +1621,7 @@ export const DeletePost = () => {
   const t = useT();
   return (
     <svg
+      aria-hidden="true"
       width="15"
       height="15"
       viewBox="0 0 24 24"

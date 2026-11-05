@@ -302,7 +302,7 @@ const ApplyCouponModal: FC<{ close: () => void }> = ({ close }) => {
               )}
             </div>
           )}
-          {!!error && <div className="text-red-400 text-[12px]">{error}</div>}
+          {!!error && <div className="text-error text-[12px]">{error}</div>}
           <div className="flex gap-[12px] justify-end">
             <Button onClick={close} className="rounded-[4px]">
               {t('close', 'Close')}
@@ -468,7 +468,7 @@ const ChargesModal: FC<{ close: () => void }> = ({ close }) => {
                   </td>
                   <td className="p-[8px]">
                     {charge.refunded ? (
-                      <span className="text-red-400">
+                      <span className="text-error">
                         {t('refunded', 'Refunded')}
                       </span>
                     ) : (
@@ -821,7 +821,7 @@ const ViewStats = () => {
   }, []);
   return (
     <div
-      className="px-[10px] rounded-[4px] bg-purple-700 text-white cursor-pointer whitespace-nowrap"
+      className="px-[10px] rounded-pill bg-accent text-white cursor-pointer whitespace-nowrap"
       onClick={handleClick}
     >
       {t('view_stats', 'View Stats')}
@@ -1073,7 +1073,7 @@ export const Impersonate = () => {
   }, [data]);
   return (
     <div>
-      <div className="bg-forth h-[52px] mobile:h-auto mobile:py-[8px] mobile:px-[8px] flex justify-center items-center border-input border rounded-[8px] text-white">
+      <div className="bg-forth h-[52px] mobile:h-auto mobile:py-[8px] mobile:px-[8px] flex justify-center items-center border-input border rounded-pill text-white">
         <div
           className={`relative flex flex-col ${
             user?.impersonate ? 'w-full px-[20px] mobile:px-0' : 'w-[600px] mobile:w-full'

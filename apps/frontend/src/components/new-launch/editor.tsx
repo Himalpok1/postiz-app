@@ -429,11 +429,11 @@ export const EditorWrapper: FC<{
       </div>
       {!!internal && !existingData?.integration && (
         <div
-          className="mt-[12px] flex gap-[20px] items-center cursor-pointer select-none mobile:mt-0 mobile:w-[40px] mobile:h-[40px] mobile:justify-center mobile:rounded-[8px] mobile:bg-btnSimple"
+          className="mt-[12px] flex gap-[20px] items-center cursor-pointer select-none mobile:mt-0 mobile:w-[40px] mobile:h-[40px] mobile:justify-center mobile:rounded-pill mobile:bg-btnSimple"
           onClick={goBackToGlobal}
         >
           <div className="flex gap-[6px] items-center mobile:hidden">
-            <div className="w-[8px] h-[8px] rounded-full bg-[#FC69FF]" />
+            <div className="w-[8px] h-[8px] rounded-full bg-accent" />
             <div className="text-[14px] font-[600]">
               {t('editing_a_specific_network', 'Editing a Specific Network')}
             </div>
@@ -506,7 +506,7 @@ export const EditorWrapper: FC<{
               )}
             </div>
             <div>
-              <div className="text-white rounded-[8px] h-[44px] px-[20px] bg-[#D82D7E] cursor-pointer flex justify-center items-center">
+              <div className="text-white rounded-pill h-[44px] px-[20px] bg-accent cursor-pointer flex justify-center items-center">
                 {t('edit_content', 'Edit content')}
               </div>
             </div>
@@ -592,7 +592,7 @@ export const EditorWrapper: FC<{
                       'delete_post_tooltip',
                       'Delete Post'
                     )}
-                    className="cursor-pointer text-[#FF3F3F]"
+                    className="cursor-pointer text-error"
                   />
                 )}
                 {index > 0 && (
@@ -943,7 +943,7 @@ export const Editor: FC<{
           <div {...getRootProps()} className="flex flex-1 flex-col">
             <div
               className={clsx(
-                'absolute left-0 top-0 w-full h-full bg-black/70 z-[300] transition-all items-center justify-center flex text-white text-sm',
+                'absolute left-0 top-0 w-full h-full bg-black/70 z-[300] transition items-center justify-center flex text-white text-sm',
                 !isDragActive ? 'pointer-events-none opacity-0' : 'opacity-100'
               )}
             >

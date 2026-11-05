@@ -20,6 +20,35 @@ import {
   PencilIcon,
 } from '@gitroom/frontend/components/ui/icons';
 
+// Tags hold customer-chosen colors, so the chip text is picked for contrast
+const luminance = (hex: string) => {
+  const [r, g, b] = [0, 2, 4].map((i) => {
+    const value = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return value <= 0.03928
+      ? value / 12.92
+      : Math.pow((value + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+
+export const readableOn = (color?: string | null) => {
+  const hex = (color || '').replace('#', '');
+  if (!/^[0-9a-fA-F]{6}$/.test(hex)) {
+    return 'var(--color-ink)';
+  }
+  const fill = luminance(hex);
+  const contrast = (text: string) => {
+    const other = luminance(text);
+    return (Math.max(fill, other) + 0.05) / (Math.min(fill, other) + 0.05);
+  };
+  // ink first, then paper; mid tones can need pure black to reach 4.5:1
+  const texts = ['1f3329', 'fffefb', '000000'];
+  const best =
+    texts.find((text) => contrast(text) >= 4.5) ||
+    [...texts].sort((a, b) => contrast(b) - contrast(a))[0];
+  return `#${best}`;
+};
+
 export const TagsComponent: FC<{
   name: string;
   label: string;
@@ -243,8 +272,8 @@ export const TagsComponentInner: FC<{
           >
             <div className="flex-1 flex">
               <span
-                className="text-[14px] font-[600] text-[#fff] px-[12px] pt-[4px] pb-[6px] rounded-[6px] text-shadow-tags break-all"
-                style={{ backgroundColor: p.color }}
+                className="text-[14px] font-[600] px-[12px] pt-[4px] pb-[6px] rounded-[6px] break-all"
+                style={{ backgroundColor: p.color, color: readableOn(p.color) }}
               >
                 {p.name}
               </span>
@@ -257,7 +286,7 @@ export const TagsComponentInner: FC<{
         ))}
         <div
           onClick={addTag}
-          className="cursor-pointer gap-[8px] flex w-full h-[44px] rounded-[8px] px-[16px] justify-center items-center bg-[#D82D7E] text-white select-none"
+          className="cursor-pointer gap-[8px] flex w-full h-[44px] rounded-pill px-[16px] justify-center items-center bg-accent text-white select-none"
         >
           <PlusIcon size={20} />
           <div className="text-[15px] font-[600]">
@@ -273,7 +302,7 @@ export const TagsComponentInner: FC<{
       ref={ref}
       className={clsx(
         'border rounded-[8px] justify-center flex items-center relative h-[44px] text-[15px] font-[600] select-none',
-        isOpen ? 'border-[#612BD3]' : 'border-newTextColor/10'
+        isOpen ? 'border-accent' : 'border-newTextColor/10'
       )}
     >
       <div
@@ -290,11 +319,12 @@ export const TagsComponentInner: FC<{
             <>
               <div
                 className="h-full flex justify-center items-center px-[8px] rounded-[4px]"
-                style={{ backgroundColor: tagValue[0].color }}
+                style={{
+                  backgroundColor: tagValue[0].color,
+                  color: readableOn(tagValue[0].color),
+                }}
               >
-                <span className="text-shadow-tags text-[#fff]">
-                  {tagValue[0].name}
-                </span>
+                <span>{tagValue[0].name}</span>
               </div>
               {tagValue.length > 1 ? <span>+{tagValue.length - 1}</span> : null}
             </>
@@ -318,8 +348,8 @@ export const TagsComponentInner: FC<{
               />
               <div className="h-full flex items-center flex-1 break-all">
                 <span
-                  className="text-[#fff] px-[8px] rounded-[8px] text-shadow-tags"
-                  style={{ backgroundColor: p.color }}
+                  className="px-[8px] rounded-[8px]"
+                  style={{ backgroundColor: p.color, color: readableOn(p.color) }}
                 >
                   {p.name}
                 </span>
@@ -342,7 +372,7 @@ export const TagsComponentInner: FC<{
           ))}
           <div
             onClick={addTag}
-            className="cursor-pointer gap-[8px] flex w-full h-[34px] rounded-[8px] mt-[12px] px-[16px] justify-center items-center bg-[#612BD3] text-white"
+            className="cursor-pointer gap-[8px] flex w-full h-[34px] rounded-pill mt-[12px] px-[16px] justify-center items-center bg-accent text-white"
           >
             <div>
               <PlusIcon />
@@ -366,7 +396,7 @@ export const Check: FC<{
       onClick={() => onChange(!value)}
       className={clsx(
         'text-[10px] font-[500] text-center flex border border-btnSimple rounded-[6px] min-w-[20px] min-h-[20px] w-[20px] h-[20px] justify-center items-center',
-        value && 'bg-[#612BD3]'
+        value && 'bg-accent'
       )}
     >
       {value ? <CheckmarkIcon className="text-white" /> : ''}

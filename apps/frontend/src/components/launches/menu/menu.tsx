@@ -174,7 +174,10 @@ export const Menu: FC<{
   const deleteChannel = useCallback(async () => {
     if (
       !(await deleteDialog(
-        t('are_you_sure_delete_channel', 'Are you sure you want to delete this channel?'),
+        t(
+          'delete_channel_removes_data',
+          'This removes the channel and its posts from Castrapid, including scheduled posts and post history. Posts already live on the platform stay there. This cannot be undone.'
+        ),
         t('delete_channel_title', 'Delete Channel')
       ))
     ) {

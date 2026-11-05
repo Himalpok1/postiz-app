@@ -382,12 +382,12 @@ const ThreadCard: FC<{
     >
       <div className="flex items-center gap-[6px] flex-wrap">
         {resolved && (
-          <div className="text-[11px] rounded-[4px] px-[6px] py-[2px] bg-btnSimple">
+          <div className="text-[11px] rounded-pill px-[6px] py-[2px] bg-btnSimple">
             {t('resolved', 'Resolved')}
           </div>
         )}
         {!!comment.anchorQuote && !anchored && !resolved && (
-          <div className="text-[11px] rounded-[4px] px-[6px] py-[2px] bg-btnSimple">
+          <div className="text-[11px] rounded-pill px-[6px] py-[2px] bg-btnSimple">
             {t('preview_comment_text_changed', 'Text changed')}
           </div>
         )}

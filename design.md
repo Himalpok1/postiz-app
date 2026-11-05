@@ -17,7 +17,7 @@ Color always carries meaning, and never carries it alone.
 - Post cards stay neutral so a full calendar stays readable. Channel logos keep their own colors.
 
 ## Tokens
-To be added in `apps/frontend/src/app/colors.scss` and `apps/frontend/tailwind.config.cjs`, in the existing `.light` block. Not `--color-custom*`.
+In `apps/frontend/src/app/colors.scss` and `apps/frontend/tailwind.config.cjs`. Not `--color-custom*`.
 ```css
 :root {
   --room-calendar: #FFE27A; --room-analytics: #A5EDD6; --room-media: #FFC4D8; --room-billing: #B8DBFF; --room-settings: #FFCDA3;
@@ -50,4 +50,4 @@ Spacing runs on a 4px scale. Dark text on any fill must reach 4.5:1 or better; a
 - Character: brisk. Only state changes animate, using `--dur-micro` and `--dur-short`. Under reduced motion everything ends at once.
 
 ## Exports
-The tokens above are the source. Tailwind names are added when the first screen is rolled out.
+The tokens above are the source, in `apps/frontend/src/app/colors.scss`. Tailwind names are in `apps/frontend/tailwind.config.cjs`: `bg-room`, `bg-roomCalendar` and the other rooms, `bg-paper2`, `bg-paper3`, `text-ink`, `text-muted`, `bg-accent`, `bg-stDraft` and the other statuses, `font-display`, `rounded-card`, `rounded-sheet`, `rounded-pill`. The active nav tile is white on the room color, as in the approved mock, because a tile in its own room color would vanish into the frame.

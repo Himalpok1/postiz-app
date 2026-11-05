@@ -1,8 +1,11 @@
 'use client';
 
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect } from 'react';
 import { Logo } from '@gitroom/frontend/components/new-layout/logo';
-import { jakartaSans } from '@gitroom/frontend/fonts/plus-jakarta-sans/plus.jakarta.sans.font';
+import {
+  CreatePostLink,
+  roomForPath,
+} from '@gitroom/frontend/components/new-layout/menu-item';
 const ModeComponent = dynamic(
   () => import('@gitroom/frontend/components/layout/mode.component'),
   {
@@ -53,9 +56,12 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
   // Feedback icon component attaches Sentry feedback to a top-bar icon when DSN is present
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
+  // on <html> so modals and popups, which render outside the shell, match too
   useEffect(() => {
-    setMenuOpen(false);
+    document.documentElement.dataset.room = roomForPath(pathname);
+    return () => {
+      delete document.documentElement.dataset.room;
+    };
   }, [pathname]);
   const load = useCallback(async (path: string) => {
     return await (await fetch(path)).json();
@@ -92,75 +98,42 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
           <PreConditionComponent />
           <NewSubscription />
           <ContinueProvider />
-          <div
-            className={clsx(
-              'flex flex-col min-h-screen min-w-screen text-newTextColor p-[12px] mobile:p-[8px] mobile:pb-[80px]',
-              jakartaSans.className
-            )}
-          >
+          <div className="flex flex-col min-h-screen min-w-screen bg-room text-newTextColor p-[16px] mobile:p-[8px] mobile:pb-[80px] transition-colors duration-[220ms]">
             <div>{user?.admin ? <Impersonate /> : <div />}</div>
             {user.tier === 'FREE' && isGeneral && billingEnabled ? (
               <FirstBillingComponent />
             ) : (
               <>
                 <AnnouncementBanner />
-                <div className="flex-1 flex gap-[8px] mobile:gap-0">
+                <div className="flex-1 flex gap-[16px] mobile:flex-col mobile:gap-[8px]">
                   <Support />
-                  {menuOpen && (
-                    <div
-                      className="hidden mobile:block fixed inset-0 bg-newBackdrop opacity-60 z-[490]"
-                      onClick={() => setMenuOpen(false)}
-                    />
-                  )}
-                  <div
+                  <nav
+                    id="left-menu"
+                    aria-label="Main"
                     className={clsx(
-                      'flex flex-col bg-newBgColorInner w-[80px] rounded-[12px] mobile:fixed mobile:top-0 mobile:bottom-0 mobile:start-0 mobile:z-[491] mobile:rounded-none mobile:overflow-y-auto mobile:overflow-x-hidden',
-                      !menuOpen && 'mobile:hidden'
+                      'flex flex-col gap-[16px] w-[192px] shrink-0 sticky top-[16px] self-start max-h-[calc(100vh-32px)] overflow-y-auto overflow-x-hidden mobile:static mobile:w-full mobile:max-h-none mobile:flex-row mobile:items-center mobile:gap-[8px] mobile:overflow-x-auto mobile:overflow-y-hidden'
                     )}
-                    onClick={() => setMenuOpen(false)}
                   >
-                    <div
-                      id="left-menu"
-                      className={clsx(
-                        'fixed h-full w-[64px] start-[20px] flex flex-1 top-0 mobile:static mobile:h-auto mobile:min-h-full mobile:mx-auto',
-                        user?.admin && 'pt-[52px] max-h-[1000px]:w-[500px]'
+                    <div className="px-[8px] pt-[8px] mobile:p-0 mobile:shrink-0 mobile:sticky mobile:start-0 mobile:z-[10] mobile:bg-room mobile:flex mobile:items-center mobile:gap-[8px]">
+                      <Logo />
+                      {pathname.indexOf('/launches') !== 0 && (
+                        <CreatePostLink className="hidden mobile:flex px-[14px] h-[40px]" />
                       )}
-                    >
-                      <div className="flex flex-col h-full gap-[32px] mobile:gap-[16px] flex-1 pt-[12px] pb-[20px] mobile:pb-[12px]">
-                        <div className="flex justify-center">
-                          <Logo />
-                        </div>
-                        <TopMenu />
-                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1 min-w-0 bg-newBgLineColor rounded-[12px] overflow-hidden flex flex-col gap-[1px] blurMe">
+                    <TopMenu />
+                    {pathname.indexOf('/launches') !== 0 && (
+                      <CreatePostLink className="flex h-[44px] mobile:hidden" />
+                    )}
+                    {/* The calendar renders its Create post and channels here */}
+                    <div id="rail-slot" className="contents mobile:hidden" />
+                  </nav>
+                  <div className="flex-1 min-w-0 bg-newBgColorInner rounded-sheet overflow-hidden flex flex-col blurMe mobile:rounded-[20px]">
                     {/* relative: the notifications popup spans this bar on phones */}
-                    <div className="relative flex bg-newBgColorInner h-[80px] mobile:h-[64px] px-[20px] mobile:px-[12px] gap-[12px] items-center">
-                      <button
-                        className="hidden mobile:flex items-center justify-center w-[36px] h-[36px] -ms-[6px] rounded-[8px] text-textItemBlur hover:text-newTextColor hover:bg-boxFocused"
-                        onClick={() => setMenuOpen(true)}
-                        aria-label="Open menu"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="22"
-                          height="22"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <path
-                            d="M3 6H21M3 12H21M3 18H21"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </button>
-                      <div className="text-[24px] mobile:text-[20px] font-[600] flex flex-1 min-w-0">
+                    <div className="relative flex h-[72px] mobile:h-[56px] px-[24px] mobile:px-[12px] gap-[12px] items-center border-b border-rule">
+                      <div className="text-[24px] mobile:text-[20px] font-[700] flex flex-1 min-w-0">
                         <Title />
                       </div>
-                      <div className="flex gap-[20px] mobile:gap-[14px] mobile:items-center text-textItemBlur">
+                      <div className="flex gap-[20px] mobile:gap-[14px] items-center text-textItemBlur">
                         <StreakComponent />
                         <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
                         <OrganizationSelector />
@@ -180,7 +153,7 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
                         <NotificationComponent />
                       </div>
                     </div>
-                    <div className="flex flex-1 min-w-0 gap-[1px] mobile:flex-col">
+                    <div className="flex flex-1 min-w-0 mobile:flex-col">
                       {children}
                     </div>
                   </div>

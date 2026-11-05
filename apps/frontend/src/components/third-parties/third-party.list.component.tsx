@@ -144,7 +144,7 @@ export const ThirdPartyListComponent: FC<{ reload: () => void }> = (props) => {
               : addApiKey(p.title, p.identifier)
           }
           key={p.identifier}
-          className="w-full h-full p-[20px] mobile:p-[14px] min-h-[100px] text-[14px] bg-newTableHeader hover:bg-newTableBorder rounded-[8px] transition-all text-textColor relative flex flex-col gap-[15px] cursor-pointer"
+          className="w-full h-full p-[20px] mobile:p-[14px] min-h-[100px] text-[14px] bg-newTableHeader hover:bg-newTableBorder rounded-[8px] transition text-textColor relative flex flex-col gap-[15px] cursor-pointer"
         >
           <div>
             <img

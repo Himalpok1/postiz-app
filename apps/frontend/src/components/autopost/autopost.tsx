@@ -321,7 +321,7 @@ export const AddOrEditWebhook: FC<{
               </div>
               <textarea
                 className={clsx(
-                  'w-full !min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[#612AD5] bg-customColor2 outline-none mb-[16px] border-fifth border rounded-[4px]'
+                  'w-full !min-h-40 !max-h-80 p-2 overflow-x-hidden scrollbar scrollbar-thumb-[var(--color-accent)] bg-customColor2 outline-none mb-[16px] border-fifth border rounded-[4px]'
                 )}
                 value={content}
                 onChange={(e) => {

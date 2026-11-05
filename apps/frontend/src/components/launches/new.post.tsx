@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+import React, { FC, useCallback, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
 import { fromUtc } from '@gitroom/frontend/components/layout/set.timezone';
 import { useCalendar } from '@gitroom/frontend/components/launches/calendar.context';
@@ -8,8 +9,10 @@ import { SetSelectionModal } from '@gitroom/frontend/components/launches/calenda
 import { AddEditModal } from '@gitroom/frontend/components/new-launch/add.edit.modal';
 import { ModalWrapperComponent } from '@gitroom/frontend/components/new-launch/modal.wrapper.component';
 
-export const NewPost = () => {
+export const NewPost: FC<{ openFromLink?: boolean }> = ({ openFromLink }) => {
   const fetch = useFetch();
+  const search = useSearchParams();
+  const router = useRouter();
   const modal = useModals();
   const { integrations, reloadCalendarView, sets } = useCalendar();
   const t = useT();
@@ -74,10 +77,18 @@ export const NewPost = () => {
       title: ``,
     });
   }, [integrations, sets]);
+  // The rail's Create post link on the other sections lands here
+  useEffect(() => {
+    if (openFromLink && search.get('create')) {
+      router.replace('/launches');
+      createAPost();
+    }
+  }, []);
+
   return (
     <button
       onClick={createAPost}
-      className="text-white flex-1 pt-[12px] pb-[14px] ps-[16px] pe-[20px] group-[.sidebar]:p-0 min-h-[44px] max-h-[44px] rounded-md bg-btnPrimary flex justify-center items-center gap-[5px] outline-none"
+      className="text-accentInk flex-1 ps-[16px] pe-[20px] group-[.sidebar]:p-0 min-h-[44px] max-h-[44px] rounded-pill bg-btnPrimary hover:bg-accentHover active:opacity-90 transition-colors duration-[120ms] flex justify-center items-center gap-[8px] font-[600]"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +106,7 @@ export const NewPost = () => {
           strokeLinejoin="round"
         />
       </svg>
-      <div className="flex-1 text-start text-[14px] group-[.sidebar]:hidden">
+      <div className="text-[16px] group-[.sidebar]:hidden">
         {t('create_new_post', 'Create Post')}
       </div>
     </button>

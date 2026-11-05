@@ -119,7 +119,7 @@ export const FAQSection: FC<{
       </div>
       <div
         className={clsx(
-          'transition-all duration-500 overflow-hidden',
+          'transition duration-500 overflow-hidden',
           !show ? 'max-h-[0]' : 'max-h-[500px]'
         )}
       >

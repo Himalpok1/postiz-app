@@ -105,7 +105,7 @@ const BillingCycle: FC<{
 
   return (
     <div className="flex items-center gap-[16px] rounded-[12px] border border-newTableBorder bg-newBgColorInner shadow-previewShadow px-[24px] py-[20px] mobile:flex-col mobile:items-stretch mobile:p-[16px]">
-      <div className="w-[48px] h-[48px] rounded-full bg-[#612bd3]/10 text-[#612bd3] flex items-center justify-center shrink-0 mobile:hidden">
+      <div className="w-[48px] h-[48px] rounded-full bg-accent/10 text-accent flex items-center justify-center shrink-0 mobile:hidden">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -154,7 +154,7 @@ type PlanAction = {
 };
 
 const planButton = {
-  primary: 'bg-btnPrimary text-white hover:bg-[#5023b8]',
+  primary: 'bg-btnPrimary text-white hover:bg-accent',
   simple: 'bg-btnSimple text-btnText hover:opacity-80',
   current: 'bg-newBgLineColor text-textItemBlur',
   danger: 'bg-red-500 text-white hover:bg-red-600',
@@ -180,7 +180,7 @@ const PlanCard: FC<{
       className={clsx(
         'relative flex flex-col gap-[20px] rounded-[12px] border p-[24px] mobile:p-[20px]',
         current
-          ? 'border-transparent bg-gradient-to-b from-seventh to-btnPrimary text-white shadow-lg shadow-purple-500/25'
+          ? 'border-transparent bg-accent text-accentInk'
           : 'border-newTableBorder bg-newBgColorInner shadow-previewShadow'
       )}
     >
@@ -231,7 +231,7 @@ const PlanCard: FC<{
           onClick={action.onClick}
           disabled={disabled}
           className={clsx(
-            'h-[44px] px-[16px] rounded-[8px] text-[15px] font-[600] flex items-center justify-center transition-all',
+            'h-[44px] px-[16px] rounded-[8px] text-[15px] font-[600] flex items-center justify-center transition',
             current
               ? action.variant === 'current'
                 ? 'bg-white/15 text-white'
@@ -286,7 +286,7 @@ const PlanCard: FC<{
               fill="none"
               className={clsx(
                 'shrink-0',
-                current ? 'text-white/75' : 'text-[#8b5cf6]'
+                current ? 'text-white/75' : 'text-[#5cf6ca]'
               )}
             >
               <circle
@@ -821,7 +821,7 @@ export const MainBillingComponent: FC<{
             )}
           >
             {t('billing_yearly', 'Yearly')}
-            <div className="bg-[#AA0FA4] text-white text-[12px] px-[6px] rounded-[4px]">
+            <div className="bg-[#0faa7e] text-white text-[12px] px-[6px] rounded-[4px]">
               {t('billing_20_percent_off', '17% Off')}
             </div>
           </div>
@@ -894,7 +894,7 @@ export const MainBillingComponent: FC<{
       )}
       {!!subscription?.id && (
         <div className="flex items-center gap-[16px] rounded-[12px] border border-newTableBorder bg-newBgColorInner shadow-previewShadow px-[24px] py-[20px] mobile:flex-col mobile:items-stretch mobile:p-[16px]">
-          <div className="w-[48px] h-[48px] rounded-full bg-[#612bd3]/10 text-[#612bd3] flex items-center justify-center shrink-0 mobile:hidden">
+          <div className="w-[48px] h-[48px] rounded-full bg-accent/10 text-accent flex items-center justify-center shrink-0 mobile:hidden">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -947,7 +947,7 @@ export const MainBillingComponent: FC<{
             <button
               type="button"
               onClick={updatePayment}
-              className="h-[44px] px-[16px] rounded-[8px] bg-btnSimple text-btnText text-[14px] font-[500] hover:opacity-80 transition-opacity"
+              className="h-[44px] px-[16px] rounded-pill bg-btnSimple text-btnText text-[14px] font-[500] hover:opacity-80 transition-opacity"
             >
               {t('billing_update_payment_method', 'Update payment method')}
             </button>
@@ -955,7 +955,7 @@ export const MainBillingComponent: FC<{
               <button
                 type="button"
                 onClick={finishTrialNow}
-                className="h-[44px] px-[16px] rounded-[8px] bg-btnSimple text-btnText text-[14px] font-[500] hover:opacity-80 transition-opacity"
+                className="h-[44px] px-[16px] rounded-pill bg-btnSimple text-btnText text-[14px] font-[500] hover:opacity-80 transition-opacity"
               >
                 {t('finish_trial', 'Finish trial')}
               </button>

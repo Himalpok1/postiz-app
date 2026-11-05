@@ -68,7 +68,7 @@ export const ApprovedAppsComponent: FC = () => {
         )}
       </div>
 
-      <div className="bg-sixth border-fifth border rounded-[4px] p-[24px]">
+      <div className="bg-paper3 rounded-card p-[24px]">
         {!apps?.length ? (
           <div className="text-customColor18">
             {t('no_approved_apps', 'No approved apps yet.')}

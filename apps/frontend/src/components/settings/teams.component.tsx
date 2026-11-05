@@ -180,7 +180,7 @@ export const TeamsComponent = () => {
           'Invite your assistant or team member to manage your account'
         )}
       </div>
-      <div className="my-[16px] mt-[16px] bg-sixth border-fifth border rounded-[4px] p-[24px] flex flex-col gap-[24px]">
+      <div className="my-[16px] mt-[16px] bg-paper3 rounded-card p-[24px] flex flex-col gap-[24px]">
         <div className="flex flex-col gap-[16px]">
           {(data || []).map((p) => (
             <div key={p.user.id} className="flex items-center">
