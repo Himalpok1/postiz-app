@@ -11,7 +11,25 @@ export class OrganizationRepository {
   constructor(
     private _organization: PrismaRepository<'organization'>,
     private _userOrg: PrismaRepository<'userOrganization'>,
-    private _user: PrismaRepository<'user'>
+    private _user: PrismaRepository<'user'>,
+    private _orgData: PrismaRepository<
+      | 'autoPost'
+      | 'sets'
+      | 'signatures'
+      | 'tags'
+      | 'notifications'
+      | 'integrationsWebhooks'
+      | 'webhooks'
+      | 'credits'
+      | 'thirdParty'
+      | 'customer'
+      | 'gitHub'
+      | 'usedCodes'
+      | 'clippingClip'
+      | 'clipping'
+      | 'oAuthAuthorization'
+      | 'oAuthApp'
+    >
   ) {}
 
   createMaxUser(id: string, name: string, saasName: string, email: string) {
@@ -653,12 +671,45 @@ export class OrganizationRepository {
     });
   }
 
-  deleteOrganization(orgId: string) {
+  // The row stays without personal data: paymentId and the subscription are
+  // billing records, and payment webhooks can still arrive for this customer
+  async deleteOrganization(orgId: string) {
+    const where = { organizationId: orgId };
+    const data = this._orgData.model;
+
+    await data.autoPost.deleteMany({ where });
+    await data.sets.deleteMany({ where });
+    await data.signatures.deleteMany({ where });
+    await data.tags.deleteMany({ where: { orgId } });
+    await data.notifications.deleteMany({ where });
+    await data.integrationsWebhooks.deleteMany({
+      where: { webhook: where },
+    });
+    await data.webhooks.deleteMany({ where });
+    await data.credits.deleteMany({ where });
+    await data.thirdParty.deleteMany({ where });
+    await data.customer.deleteMany({ where: { orgId } });
+    await data.gitHub.deleteMany({ where });
+    await data.usedCodes.deleteMany({ where: { orgId } });
+    await data.clippingClip.deleteMany({ where: { clipping: where } });
+    await data.clipping.deleteMany({ where });
+    await data.oAuthAuthorization.deleteMany({
+      where: { OR: [where, { oauthApp: where }] },
+    });
+    await data.oAuthApp.deleteMany({ where });
+
     return this._organization.model.organization.update({
       where: {
         id: orgId,
       },
+      select: {
+        id: true,
+      },
       data: {
+        name: '',
+        description: null,
+        apiKey: null,
+        streakSince: null,
         deletedAt: new Date(),
       },
     });

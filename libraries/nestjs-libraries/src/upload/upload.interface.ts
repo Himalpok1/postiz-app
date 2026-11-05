@@ -19,6 +19,8 @@ export interface IUploadProvider {
     ext: string
   ): Promise<UploadedStream>;
   removeFile(filePath: string): Promise<void>;
+  // Size in bytes of an already stored file, by the path it was saved under
+  fileSize(filePath: string): Promise<number>;
   // Presigned URLs handed to the media processor, which has no storage
   // credentials; only cloud storage can mint them
   signDownloadUrl?(fileName: string): Promise<string>;

@@ -3,7 +3,6 @@ import {
   PrismaTransaction,
 } from '@gitroom/nestjs-libraries/database/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { createHash } from 'crypto';
 import { Provider, Role } from '@prisma/client';
 import { AuthService } from '@gitroom/helpers/auth/auth.service';
 import { UserDetailDto } from '@gitroom/nestjs-libraries/dtos/users/user.details.dto';
@@ -15,6 +14,10 @@ import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 export class UsersRepository {
   constructor(
     private _user: PrismaRepository<'user'>,
+    private _authorization: PrismaRepository<'oAuthAuthorization'>,
+    private _comments: PrismaRepository<'comments'>,
+    private _agency: PrismaRepository<'socialMediaAgency'>,
+    private _agencyNiche: PrismaRepository<'socialMediaAgencyNiche'>,
     private _transaction: PrismaTransaction
   ) {}
 
@@ -184,27 +187,57 @@ export class UsersRepository {
       return;
     }
 
-    const hash = (value: string) =>
-      createHash('md5').update(value).digest('hex');
+    await this._authorization.model.oAuthAuthorization.deleteMany({
+      where: {
+        userId,
+      },
+    });
 
-    // Hash the identifying fields instead of removing the row, the random
-    // suffix keeps [email, providerName] unique if the same email is deleted
-    // more than once
+    await this._agencyNiche.model.socialMediaAgencyNiche.deleteMany({
+      where: {
+        agency: {
+          userId,
+        },
+      },
+    });
+
+    await this._agency.model.socialMediaAgency.deleteMany({
+      where: {
+        userId,
+      },
+    });
+
+    await this._comments.model.comments.updateMany({
+      where: {
+        userId,
+      },
+      data: {
+        displayName: null,
+      },
+    });
+
+    // The row stays for the records that point at it, without personal data.
+    // The random email keeps [email, providerName] unique.
     return this._user.model.user.update({
       where: {
         id: userId,
       },
+      select: {
+        id: true,
+      },
       data: {
-        email: `deleted_${hash(user.email.toLowerCase())}_${makeId(5)}`,
+        email: `deleted_${makeId(20)}`,
         password: null,
-        name: user.name ? hash(user.name) : null,
-        lastName: user.lastName ? hash(user.lastName) : null,
-        providerId: user.providerId ? hash(user.providerId) : null,
+        name: null,
+        lastName: null,
+        providerId: null,
         bio: null,
         ip: null,
         agent: null,
         account: null,
         pictureId: null,
+        timezoneName: null,
+        inviteId: null,
         deletedAt: new Date(),
       },
     });

@@ -1,5 +1,5 @@
 import { IUploadProvider, UploadedStream } from './upload.interface';
-import { createWriteStream, mkdirSync, unlink, writeFileSync } from 'fs';
+import { createWriteStream, mkdirSync, statSync, unlink, writeFileSync } from 'fs';
 import { resolve, sep } from 'path';
 import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
@@ -141,7 +141,7 @@ export class LocalStorage implements IUploadProvider {
   // Accepts either the public URL or the filesystem path. Callers can pass a
   // stored media name or path, so only a file inside the upload directory is
   // ever deleted: resolve() collapses any `..` segments before the comparison
-  async removeFile(filePath: string): Promise<void> {
+  private localPath(filePath: string) {
     const publicPrefix = process.env.FRONTEND_URL + '/uploads';
     const base = resolve(String(this.uploadDirectory));
     const localPath = resolve(
@@ -152,10 +152,19 @@ export class LocalStorage implements IUploadProvider {
     if (!localPath.startsWith(base + sep)) {
       throw new Error('Unsafe file path');
     }
+    return localPath;
+  }
+
+  async fileSize(filePath: string): Promise<number> {
+    return statSync(this.localPath(filePath)).size;
+  }
+
+  async removeFile(filePath: string): Promise<void> {
+    const localPath = this.localPath(filePath);
     // Logic to remove the file from the filesystem goes here
     return new Promise((resolve, reject) => {
       unlink(localPath, (err) => {
-        if (err) {
+        if (err && err.code !== 'ENOENT') {
           reject(err);
         } else {
           resolve();

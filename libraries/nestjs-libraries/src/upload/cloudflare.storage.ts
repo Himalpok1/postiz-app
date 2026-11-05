@@ -3,6 +3,7 @@ import {
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
+  HeadObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Upload } from '@aws-sdk/lib-storage';
@@ -244,6 +245,16 @@ class CloudflareStorage implements IUploadProvider {
   }
 
   // Accepts either the public URL or the bare key
+  async fileSize(filePath: string): Promise<number> {
+    const { ContentLength } = await this._client.send(
+      new HeadObjectCommand({
+        Bucket: this._bucketName,
+        Key: filePath.split('/').pop(),
+      })
+    );
+    return ContentLength || 0;
+  }
+
   async removeFile(filePath: string): Promise<void> {
     const fileName = filePath.split('/').pop();
     if (!fileName) {

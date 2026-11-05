@@ -1,4 +1,5 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import { UsageService } from '@gitroom/nestjs-libraries/database/prisma/usage/usage.service';
 import { MediaRepository } from '@gitroom/nestjs-libraries/database/prisma/media/media.repository';
 import { OpenaiService } from '@gitroom/nestjs-libraries/openai/openai.service';
 import { generationError } from '@gitroom/nestjs-libraries/openai/generation.error';
@@ -91,11 +92,93 @@ export class MediaService {
     private _openAi: OpenaiService,
     private _subscriptionService: SubscriptionService,
     private _videoManager: VideoManager,
-    private _temporalService: TemporalService
+    private _temporalService: TemporalService,
+    private _usageService: UsageService
   ) {}
 
   async deleteMedia(org: string, id: string) {
-    return this._mediaRepository.deleteMedia(org, id);
+    const media = await this._mediaRepository.getMediaById(id);
+    const removable =
+      !!media &&
+      media.organizationId === org &&
+      !(await this._mediaRepository.isMediaInUse(org, media.path));
+
+    const removed =
+      removable &&
+      (await this.removeStoredFiles(org, [media.path, media.thumbnail]));
+
+    if (removed && media.thumbnail) {
+      await this._mediaRepository.deleteThumbnailRows(org, media.thumbnail);
+    }
+
+    return this._mediaRepository.deleteMedia(org, id, !!removed);
+  }
+
+  // Returns false when a file couldn't be removed and is still in storage
+  private async removeStoredFiles(org: string, paths: (string | null)[]) {
+    let removed = true;
+    for (const path of paths) {
+      if (!path) {
+        continue;
+      }
+      try {
+        if (!(await this._mediaRepository.isPathSharedWithOtherOrg(org, path))) {
+          await this.storage.removeFile(path);
+        }
+      } catch (err: any) {
+        // A path outside of our storage has no file of ours to remove
+        if (err?.message !== 'Unsafe file path') {
+          removed = false;
+          console.log('Could not remove stored file', err);
+        }
+      }
+    }
+    return removed;
+  }
+
+  // A row whose file couldn't be removed stays, it's the record of what is
+  // still left in storage
+  async deleteAllMedia(org: string) {
+    const files = await this._mediaRepository.getAllMediaFiles(org);
+    const removed: string[] = [];
+
+    for (const file of files) {
+      if (await this.removeStoredFiles(org, [file.path, file.thumbnail])) {
+        removed.push(file.id);
+      }
+    }
+
+    await this._mediaRepository.deleteMediaRows(org, removed);
+  }
+
+  // Drops a file from an upload that was refused. A file that a media row
+  // already points at isn't this upload's to remove (the bucket key can come
+  // from the client, and a retry can register the same key again)
+  private async discardUpload(org: string, path: string) {
+    if (!(await this._mediaRepository.isPathRegistered(path))) {
+      await this.removeStoredFiles(org, [path]);
+    }
+  }
+
+  private async readFileSize(path: string) {
+    try {
+      return await this.storage.fileSize(path);
+    } catch (err) {
+      return 0;
+    }
+  }
+
+  // Bytes this organization keeps in storage. Files saved before sizes were
+  // recorded are measured here a batch at a time, so they count too
+  async getStorageUsed(org: string) {
+    const unmeasured = await this._mediaRepository.getUnmeasuredMedia(org, 100);
+    for (const media of unmeasured) {
+      const size = await this.readFileSize(media.path);
+      if (size) {
+        await this._mediaRepository.setFileSize(media.id, size);
+      }
+    }
+    return this._mediaRepository.getStorageUsed(org);
   }
 
   getMediaById(id: string) {
@@ -165,18 +248,57 @@ export class MediaService {
       : this.saveFile(org, uploaded.originalname, uploaded.path);
   }
 
-  saveFile(
+  async saveFile(
+    org: string,
+    fileName: string,
+    filePath: string,
+    originalName?: string,
+    status?: string
+  ) {
+    const fileSize = await this.readFileSize(filePath);
+    const message = await this._usageService.storageLimitMessage(
+      org,
+      await this.getStorageUsed(org),
+      fileSize
+    );
+    if (message) {
+      await this.discardUpload(org, filePath);
+      throw new BadRequestException(message);
+    }
+
+    const media = await this._mediaRepository.saveFile(
+      org,
+      fileName,
+      filePath,
+      originalName,
+      fileSize,
+      status
+    );
+
+    // Uploads finishing together can each pass the check above, so it's
+    // repeated with this file counted
+    const overLimit = await this._usageService.storageLimitMessage(
+      org,
+      await this._mediaRepository.getStorageUsed(org),
+      0
+    );
+    if (overLimit) {
+      await this._mediaRepository.deleteRow(org, media.id);
+      await this.discardUpload(org, filePath);
+      throw new BadRequestException(overLimit);
+    }
+
+    return media;
+  }
+
+  // Thumbnails don't show in the library but take space like any other file
+  saveThumbnail(
     org: string,
     fileName: string,
     filePath: string,
     originalName?: string
   ) {
-    return this._mediaRepository.saveFile(
-      org,
-      fileName,
-      filePath,
-      originalName
-    );
+    return this.saveFile(org, fileName, filePath, originalName, 'thumbnail');
   }
 
   // Saves an upload and, when a normalizer is configured, hands it to the

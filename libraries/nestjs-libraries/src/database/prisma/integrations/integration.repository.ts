@@ -16,6 +16,7 @@ export class IntegrationRepository {
     private _posts: PrismaRepository<'post'>,
     private _plugs: PrismaRepository<'plugs'>,
     private _exisingPlugData: PrismaRepository<'exisingPlugData'>,
+    private _integrationsWebhooks: PrismaRepository<'integrationsWebhooks'>,
     private _customers: PrismaRepository<'customer'>,
     private _mentions: PrismaRepository<'mentions'>
   ) {}
@@ -211,6 +212,8 @@ export class IntegrationRepository {
         },
         data: {
           internalId: `deleted_${params.internalId}_${makeId(10)}`,
+          token: '',
+          refreshToken: null,
           deletedAt: new Date(),
         },
       });
@@ -804,18 +807,47 @@ export class IntegrationRepository {
     });
   }
 
-  getPostsForChannel(org: string, id: string) {
-    return this._posts.model.post.groupBy({
-      by: ['group'],
+  // Removes what the channel holds and leaves a row without personal data, so
+  // only the md5 of the platform id remains. checkPreviousConnections needs it
+  // to stop one channel from being used for a new trial again and again.
+  async deleteChannel(org: string, id: string) {
+    const integration = await this._integration.model.integration.findFirst({
       where: {
+        id,
         organizationId: org,
-        integrationId: id,
-        deletedAt: null,
+      },
+      select: {
+        id: true,
+        rootInternalId: true,
+        deletedAt: true,
       },
     });
-  }
 
-  deleteChannel(org: string, id: string) {
+    if (!integration) {
+      return null;
+    }
+
+    await this._plugs.model.plugs.deleteMany({
+      where: {
+        integrationId: id,
+      },
+    });
+
+    await this._exisingPlugData.model.exisingPlugData.deleteMany({
+      where: {
+        integrationId: id,
+      },
+    });
+
+    await this._integrationsWebhooks.model.integrationsWebhooks.deleteMany({
+      where: {
+        integrationId: id,
+      },
+    });
+
+    const rootInternalId = integration.rootInternalId;
+    const alreadyHashed = /^[a-f0-9]{32}$/.test(rootInternalId || '');
+
     return this._integration.model.integration.update({
       select: {
         id: true,
@@ -825,58 +857,53 @@ export class IntegrationRepository {
         organizationId: org,
       },
       data: {
-        deletedAt: new Date(),
+        name: '',
+        customName: null,
+        picture: null,
+        internalId: `deleted_${makeId(20)}`,
+        rootInternalId:
+          rootInternalId && !alreadyHashed
+            ? createHash('md5').update(rootInternalId).digest('hex')
+            : rootInternalId,
+        token: '',
+        tokenExpiration: null,
+        refreshToken: null,
+        profile: null,
+        customInstanceDetails: null,
+        additionalSettings: '[]',
+        customerId: null,
+        disabled: true,
+        inBetweenSteps: false,
+        refreshNeeded: false,
+        deletedAt: integration.deletedAt || new Date(),
       },
     });
   }
 
-  async deleteIntegrationsForAccount(org: string) {
-    const hash = (value: string) =>
-      createHash('md5').update(value).digest('hex');
-
-    await this._posts.model.post.updateMany({
+  // Revoking a token shared with another channel would disconnect that channel
+  async isTokenShared(integration: Integration) {
+    const count = await this._integration.model.integration.count({
       where: {
-        organizationId: org,
+        id: { not: integration.id },
         deletedAt: null,
-      },
-      data: {
-        deletedAt: new Date(),
+        OR: [
+          { token: integration.token },
+          ...(integration.refreshToken
+            ? [{ refreshToken: integration.refreshToken }]
+            : []),
+        ],
       },
     });
 
-    const integrations = await this._integration.model.integration.findMany({
+    return count > 0;
+  }
+
+  getAllChannelsForAccount(org: string) {
+    return this._integration.model.integration.findMany({
       where: {
         organizationId: org,
       },
     });
-
-    // md5 is deterministic, so a hashed rootInternalId can still be matched
-    // by checkPreviousConnections when the same channel is connected again
-    // from a new account.
-    for (const integration of integrations) {
-      await this._integration.model.integration.update({
-        where: {
-          id: integration.id,
-        },
-        data: {
-          name: hash(integration.name),
-          internalId: hash(integration.internalId),
-          rootInternalId: integration.rootInternalId
-            ? hash(integration.rootInternalId)
-            : null,
-          token: hash(integration.token),
-          refreshToken: integration.refreshToken
-            ? hash(integration.refreshToken)
-            : null,
-          profile: integration.profile ? hash(integration.profile) : null,
-          customInstanceDetails: integration.customInstanceDetails
-            ? hash(integration.customInstanceDetails)
-            : null,
-          picture: null,
-          deletedAt: integration.deletedAt || new Date(),
-        },
-      });
-    }
   }
 
   async checkForDeletedOnceAndUpdate(org: string, page: string) {

@@ -65,6 +65,11 @@ export interface IAuthenticator {
     id: string,
     accessToken: string
   ): Promise<{ id: string; url: string }[]>;
+  revokeAccess?(
+    accessToken: string,
+    refreshToken: string | null,
+    integration: Integration
+  ): Promise<void>; // Cancels our access on the platform when a channel is deleted, best effort
 }
 
 export interface AnalyticsData {
@@ -176,10 +181,22 @@ export type FetchPageInformationResult = {
   username: string;
 };
 
+export interface MeteredAnalytics {
+  readAfterHours: number[]; // When to read each post, counted from its publish date
+  postsPerMonth: number; // Most posts tracked per channel per calendar month
+}
+
 export interface SocialProvider
   extends IAuthenticator,
     ISocialMediaIntegration {
   identifier: string;
+  // Set when the platform charges per read: metrics are read on a schedule and
+  // stored, and the analytics screens show the stored numbers instead
+  meteredAnalytics?: MeteredAnalytics;
+  readPostMetrics?(
+    accessToken: string,
+    releaseIds: string[]
+  ): Promise<Record<string, Record<string, number>>>;
   refreshWait?: boolean;
   convertToJPEG?: boolean;
   stripLinks?: () => boolean;

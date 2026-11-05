@@ -45,6 +45,7 @@ model Organization {
   webhooks            Webhooks[]
   oauthApp            OAuthApp[]
   oauthAuthorizations OAuthAuthorization[]
+  publishUsage        PublishUsage[]
 
   @@index([apiKey])
   @@index([streakSince])
@@ -493,6 +494,7 @@ model Post {
   submittedForOrder          Orders?                   @relation(fields: [submittedForOrderId], references: [id])
   submittedForOrganization   Organization?             @relation("submittedForOrg", fields: [submittedForOrganizationId], references: [id])
   tags                       TagsPosts[]
+  metrics                    PostMetrics?
 
   @@index([group])
   @@index([batchId])
@@ -635,6 +637,34 @@ model ExisingPlugData {
   integration   Integration @relation(fields: [integrationId], references: [id])
 
   @@unique([integrationId, methodName, value])
+}
+
+model PostMetrics {
+  postId        String   @id
+  integrationId String
+  publishDate   DateTime
+  metrics       String   @default("{}")
+  reads         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  post          Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId, publishDate])
+}
+
+model PublishUsage {
+  id                 String       @id @default(uuid())
+  organizationId     String
+  providerIdentifier String
+  periodStart        DateTime
+  posts              Int          @default(0)
+  linkPosts          Int          @default(0)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  organization       Organization @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, providerIdentifier, periodStart])
+  @@index([organizationId])
 }
 
 model PopularPosts {

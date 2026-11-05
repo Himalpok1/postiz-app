@@ -25,6 +25,8 @@ import { UploadFactory } from '@gitroom/nestjs-libraries/upload/upload.factory';
 import { PlugDto } from '@gitroom/nestjs-libraries/dtos/plugs/plug.dto';
 import { difference, uniq } from 'lodash';
 import utc from 'dayjs/plugin/utc';
+import { PostMetricsService } from '@gitroom/nestjs-libraries/database/prisma/post-metrics/post.metrics.service';
+import { UsageService } from '@gitroom/nestjs-libraries/database/prisma/usage/usage.service';
 import { AutopostRepository } from '@gitroom/nestjs-libraries/database/prisma/autopost/autopost.repository';
 import { RefreshIntegrationService } from '@gitroom/nestjs-libraries/integrations/refresh.integration.service';
 import { TemporalService } from 'nestjs-temporal-core';
@@ -41,7 +43,9 @@ export class IntegrationService {
     private _notificationService: NotificationService,
     @Inject(forwardRef(() => RefreshIntegrationService))
     private _refreshIntegrationService: RefreshIntegrationService,
-    private _temporalService: TemporalService
+    private _temporalService: TemporalService,
+    private _usageService: UsageService,
+    private _postMetricsService: PostMetricsService
   ) {}
 
   async changeActiveCron(orgId: string) {
@@ -395,12 +399,54 @@ export class IntegrationService {
     return this._integrationRepository.enableChannel(org, id);
   }
 
-  async getPostsForChannel(org: string, id: string) {
-    return this._integrationRepository.getPostsForChannel(org, id);
+  // Best effort: our copy of the token is wiped either way, and the platform
+  // may already have rejected it
+  private async revokeChannelAccess(integration: Integration) {
+    try {
+      const provider = this._integrationManager.getSocialIntegration(
+        integration.providerIdentifier
+      );
+
+      if (
+        !provider?.revokeAccess ||
+        !integration.token ||
+        integration.deletedAt ||
+        (await this._integrationRepository.isTokenShared(integration))
+      ) {
+        return;
+      }
+
+      await provider.revokeAccess(
+        integration.token,
+        integration.refreshToken,
+        integration
+      );
+    } catch (err) {
+      console.log('Could not revoke channel access', err);
+    }
   }
 
   async deleteChannel(org: string, id: string) {
+    const integration = await this._integrationRepository.getIntegrationById(
+      org,
+      id
+    );
+
+    if (integration) {
+      await this.revokeChannelAccess(integration);
+    }
+
     return this._integrationRepository.deleteChannel(org, id);
+  }
+
+  async deleteChannelsForAccount(org: string) {
+    const integrations =
+      await this._integrationRepository.getAllChannelsForAccount(org);
+
+    for (const integration of integrations) {
+      await this.revokeChannelAccess(integration);
+      await this._integrationRepository.deleteChannel(org, integration.id);
+    }
   }
 
   async disableIntegrations(org: string, totalChannels: number) {
@@ -481,6 +527,14 @@ export class IntegrationService {
     const integrationProvider = this._integrationManager.getSocialIntegration(
       getIntegration.providerIdentifier
     );
+
+    if (integrationProvider.meteredAnalytics) {
+      return this._postMetricsService.getChannelAnalytics(
+        org.id,
+        getIntegration.id,
+        days
+      );
+    }
 
     if (
       dayjs(getIntegration?.tokenExpiration).isBefore(dayjs()) ||
@@ -604,13 +658,28 @@ export class IntegrationService {
       getIntegration.providerIdentifier
     );
 
-    // @ts-ignore
-    await getSocialIntegration?.[getAllInternalPlugs.methodName]?.(
-      getIntegration,
-      originalIntegration,
-      data.post,
-      data.information
+    const { reservation, error } = await this._usageService.reservePublish(
+      data.orgId,
+      getIntegration.providerIdentifier,
+      ['']
     );
+
+    if (error) {
+      return;
+    }
+
+    try {
+      // @ts-ignore
+      await getSocialIntegration?.[getAllInternalPlugs.methodName]?.(
+        getIntegration,
+        originalIntegration,
+        data.post,
+        data.information
+      );
+    } catch (err) {
+      await this._usageService.releasePublish(data.orgId, reservation);
+      throw err;
+    }
 
     return;
   }
@@ -631,19 +700,49 @@ export class IntegrationService {
       getPlugById.integration.providerIdentifier
     );
 
-    // @ts-ignore
-    const process = await integration[getPlugById.plugFunction](
-      getPlugById.integration,
-      data.postId,
-      JSON.parse(getPlugById.data).reduce((all: any, current: any) => {
+    const fields = JSON.parse(getPlugById.data).reduce(
+      (all: any, current: any) => {
         all[current.name] = current.value;
         return all;
-      }, {})
+      },
+      {}
     );
+
+    const { reservation, error } = await this._usageService.reservePublish(
+      getPlugById.organizationId,
+      getPlugById.integration.providerIdentifier,
+      [Object.values(fields).join(' ')]
+    );
+
+    if (error) {
+      return true;
+    }
+
+    let process;
+    try {
+      // @ts-ignore
+      process = await integration[getPlugById.plugFunction](
+        getPlugById.integration,
+        data.postId,
+        fields
+      );
+    } catch (err) {
+      await this._usageService.releasePublish(
+        getPlugById.organizationId,
+        reservation
+      );
+      throw err;
+    }
 
     if (process) {
       return true;
     }
+
+    // the plug's condition wasn't met yet, so nothing was published
+    await this._usageService.releasePublish(
+      getPlugById.organizationId,
+      reservation
+    );
 
     if (data.totalRuns === data.currentRun) {
       return true;

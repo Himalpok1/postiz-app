@@ -293,6 +293,18 @@ export class TiktokProvider extends SocialAbstract implements SocialProvider {
     return undefined;
   }
 
+  async revokeAccess(accessToken: string) {
+    await fetch('https://open.tiktokapis.com/v2/oauth/revoke/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_key: process.env.TIKTOK_CLIENT_ID!,
+        client_secret: process.env.TIKTOK_CLIENT_SECRET!,
+        token: accessToken,
+      }),
+    });
+  }
+
   async refreshToken(refreshToken: string): Promise<AuthTokenDetails> {
     const value = {
       client_key: process.env.TIKTOK_CLIENT_ID!,

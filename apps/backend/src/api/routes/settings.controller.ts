@@ -16,14 +16,26 @@ import { AddTeamMemberDto } from '@gitroom/nestjs-libraries/dtos/settings/add.te
 import { AdminAddTeamMemberDto } from '@gitroom/nestjs-libraries/dtos/settings/admin.add.team.member.dto';
 import { ShortlinkPreferenceDto } from '@gitroom/nestjs-libraries/dtos/settings/shortlink-preference.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { UsageService } from '@gitroom/nestjs-libraries/database/prisma/usage/usage.service';
+import { MediaService } from '@gitroom/nestjs-libraries/database/prisma/media/media.service';
 import { AuthorizationActions, Sections } from '@gitroom/backend/services/auth/permissions/permission.exception.class';
 
 @ApiTags('Settings')
 @Controller('/settings')
 export class SettingsController {
   constructor(
-    private _organizationService: OrganizationService
+    private _organizationService: OrganizationService,
+    private _usageService: UsageService,
+    private _mediaService: MediaService
   ) {}
+
+  @Get('/usage')
+  async getUsage(@GetOrgFromRequest() org: Organization) {
+    return this._usageService.getUsage(
+      org.id,
+      await this._mediaService.getStorageUsed(org.id)
+    );
+  }
 
   @Get('/team')
   @CheckPolicies(

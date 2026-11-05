@@ -238,7 +238,7 @@ export const FirstBillingComponent = () => {
                   onClick={() => setPeriod('YEARLY')}
                 >
                   <div>{t('billing_yearly', 'Yearly')}</div>
-                  <div className="bg-[#AA0FA4] text-[white] px-[8px] rounded-[4px] mobile:hidden">
+                  <div className="bg-[#0faa7e] text-[white] px-[8px] rounded-[4px] mobile:hidden">
                     {t('billing_20_percent_off', '17% Off')}
                   </div>
                 </div>
@@ -321,6 +321,30 @@ export const useBillingFeatures = (tier: string) => {
         currentPricing.posts_per_month > 10000
           ? 'unlimited'
           : currentPricing.posts_per_month,
+    });
+
+    list.push({
+      key: 'billing_x_posts_per_month',
+      defaultValue: 'X posts per month',
+      prefix: currentPricing.publish_limits.x?.posts,
+    });
+
+    list.push({
+      key: 'billing_x_link_posts_per_month',
+      defaultValue: 'X posts with links per month',
+      prefix: currentPricing.publish_limits.x?.link_posts,
+    });
+
+    list.push({
+      key: 'billing_youtube_uploads_per_day',
+      defaultValue: 'YouTube uploads per day',
+      prefix: currentPricing.publish_limits.youtube?.posts,
+    });
+
+    list.push({
+      key: 'billing_storage_gb',
+      defaultValue: 'GB of media storage',
+      prefix: currentPricing.storage_gb,
     });
 
     if (currentPricing.team_members) {

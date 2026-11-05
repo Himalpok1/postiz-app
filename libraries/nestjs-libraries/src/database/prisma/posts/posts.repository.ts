@@ -394,6 +394,31 @@ export class PostsRepository {
     });
   }
 
+  getGroupsToDelete(orgId: string, integrationId?: string) {
+    return this._post.model.post.groupBy({
+      by: ['group'],
+      where: {
+        organizationId: orgId,
+        deletedAt: null,
+        ...(integrationId ? { integrationId } : {}),
+      },
+    });
+  }
+
+  async purgePosts(orgId: string, integrationId?: string) {
+    const where = {
+      organizationId: orgId,
+      ...(integrationId ? { integrationId } : {}),
+    };
+
+    await this._errors.model.errors.deleteMany({ where: { post: where } });
+    await this._comments.model.comments.deleteMany({ where: { post: where } });
+    await this._tagsPosts.model.tagsPosts.deleteMany({
+      where: { post: where },
+    });
+    await this._post.model.post.deleteMany({ where });
+  }
+
   getPostsByGroup(orgId: string, group: string) {
     return this._post.model.post.findMany({
       where: {

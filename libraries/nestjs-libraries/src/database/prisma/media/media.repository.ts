@@ -4,9 +4,20 @@ import { SaveMediaInformationDto } from '@gitroom/nestjs-libraries/dtos/media/sa
 
 @Injectable()
 export class MediaRepository {
-  constructor(private _media: PrismaRepository<'media'>) {}
+  constructor(
+    private _media: PrismaRepository<'media'>,
+    private _post: PrismaRepository<'post'>,
+    private _sets: PrismaRepository<'sets'>
+  ) {}
 
-  saveFile(org: string, fileName: string, filePath: string, originalName?: string) {
+  saveFile(
+    org: string,
+    fileName: string,
+    filePath: string,
+    originalName?: string,
+    fileSize = 0,
+    status = 'ready'
+  ) {
     return this._media.model.media.create({
       data: {
         organization: {
@@ -17,6 +28,8 @@ export class MediaRepository {
         name: fileName,
         path: filePath,
         originalName: originalName || null,
+        fileSize,
+        status,
       },
       select: {
         id: true,
@@ -84,7 +97,7 @@ export class MediaRepository {
     });
   }
 
-  deleteMedia(org: string, id: string) {
+  deleteMedia(org: string, id: string, fileRemoved = false) {
     return this._media.model.media.update({
       where: {
         id,
@@ -92,7 +105,109 @@ export class MediaRepository {
       },
       data: {
         deletedAt: new Date(),
+        // the file is gone, so it stops counting against the storage limit
+        ...(fileRemoved ? { fileSize: 0 } : {}),
       },
+    });
+  }
+
+  // A post that hasn't been published yet, or a saved set, still needs the file
+  async isMediaInUse(org: string, path: string) {
+    const [posts, sets, media] = await Promise.all([
+      this._post.model.post.count({
+        where: {
+          organizationId: org,
+          deletedAt: null,
+          // a published repeat post publishes again with the same files
+          OR: [
+            { state: { in: ['QUEUE', 'DRAFT'] } },
+            { intervalInDays: { not: null } },
+          ],
+          image: { contains: path },
+        },
+      }),
+      this._sets.model.sets.count({
+        where: { organizationId: org, content: { contains: path } },
+      }),
+      this._media.model.media.count({
+        where: {
+          path,
+          organizationId: org,
+          OR: [
+            { userPicture: { some: {} } },
+            { oauthApps: { some: {} } },
+            { agencies: { some: {} } },
+          ],
+        },
+      }),
+    ]);
+
+    return posts + sets + media > 0;
+  }
+
+  // The bucket key comes from the client on some upload routes, so a file is
+  // only removed when no other organization's media points at it
+  async isPathSharedWithOtherOrg(org: string, path: string) {
+    const count = await this._media.model.media.count({
+      where: { path, organizationId: { not: org } },
+    });
+    return count > 0;
+  }
+
+  async isPathRegistered(path: string) {
+    const count = await this._media.model.media.count({
+      where: { path },
+    });
+    return count > 0;
+  }
+
+  async getStorageUsed(org: string) {
+    const { _sum } = await this._media.model.media.aggregate({
+      where: { organizationId: org },
+      _sum: { fileSize: true },
+    });
+    return _sum.fileSize || 0;
+  }
+
+  // Files saved before sizes were recorded have a fileSize of 0
+  getUnmeasuredMedia(org: string, take: number) {
+    return this._media.model.media.findMany({
+      where: { organizationId: org, deletedAt: null, fileSize: 0 },
+      select: { id: true, path: true },
+      take,
+    });
+  }
+
+  setFileSize(id: string, fileSize: number) {
+    return this._media.model.media.update({
+      where: { id },
+      data: { fileSize },
+      select: { id: true },
+    });
+  }
+
+  getAllMediaFiles(org: string) {
+    return this._media.model.media.findMany({
+      where: { organizationId: org },
+      select: { id: true, path: true, thumbnail: true },
+    });
+  }
+
+  deleteMediaRows(org: string, ids: string[]) {
+    return this._media.model.media.deleteMany({
+      where: { organizationId: org, id: { in: ids } },
+    });
+  }
+
+  deleteRow(org: string, id: string) {
+    return this._media.model.media.deleteMany({
+      where: { organizationId: org, id },
+    });
+  }
+
+  deleteThumbnailRows(org: string, path: string) {
+    return this._media.model.media.deleteMany({
+      where: { organizationId: org, path, status: 'thumbnail' },
     });
   }
 
@@ -136,7 +251,7 @@ export class MediaRepository {
           id: org,
         },
         deletedAt: null,
-        status: { not: 'processing' },
+        status: { notIn: ['processing', 'thumbnail'] },
         ...searchFilter,
       },
     };
@@ -146,7 +261,7 @@ export class MediaRepository {
         organizationId: org,
         deletedAt: null,
         // still being normalized: it shows up once the workflow releases it
-        status: { not: 'processing' },
+        status: { notIn: ['processing', 'thumbnail'] },
         ...searchFilter,
       },
       orderBy: {

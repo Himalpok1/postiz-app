@@ -23,6 +23,8 @@ import {
   organizationId,
   postId as postIdSearchParam,
 } from '@gitroom/nestjs-libraries/temporal/temporal.search.attribute';
+import { PostMetricsService } from '@gitroom/nestjs-libraries/database/prisma/post-metrics/post.metrics.service';
+import { UsageService } from '@gitroom/nestjs-libraries/database/prisma/usage/usage.service';
 import { SubscriptionService } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/subscription.service';
 import {
   setHeartbeatDetails,
@@ -104,7 +106,9 @@ export class PostActivity {
     private _refreshIntegrationService: RefreshIntegrationService,
     private _webhookService: WebhooksService,
     private _temporalService: TemporalService,
-    private _subscriptionService: SubscriptionService
+    private _subscriptionService: SubscriptionService,
+    private _usageService: UsageService,
+    private _postMetricsService: PostMetricsService
   ) {}
 
   @ActivityMethod()
@@ -148,6 +152,11 @@ export class PostActivity {
   }
 
   @ActivityMethod()
+  async readDuePostMetrics() {
+    await this._postMetricsService.readDueMetrics();
+  }
+
+  @ActivityMethod()
   async updatePost(id: string, postId: string, releaseURL: string) {
     await this._postService.updatePost(id, postId, releaseURL);
   }
@@ -163,7 +172,7 @@ export class PostActivity {
       }
     }
     const post = await this._postService.getPostById(postId, orgId);
-    if (post.deletedAt) {
+    if (!post || post.deletedAt) {
       return false;
     }
 
@@ -396,21 +405,61 @@ export class PostActivity {
       }))
     );
 
+    setHeartbeatDetails('publish limits');
+    // updateTags resolves post references, which turn into links
+    const thread = getIntegration.comment
+      ? await this._postService.updateTags(
+          integration.organizationId,
+          (await this._postService.getPostsRecursively(
+            posts[0].id,
+            true,
+            integration.organizationId
+          )) as Post[]
+        )
+      : [];
+    const { reservation, error } = await this._usageService.reservePublish(
+      integration.organizationId,
+      integration.providerIdentifier,
+      thread?.length
+        ? thread.map((p) => p.content)
+        : mappedPosts.map((p) => p.message)
+    );
+
+    if (error) {
+      throw new BadBody(
+        integration.providerIdentifier,
+        JSON.stringify({}),
+        Buffer.from('{}'),
+        error
+      );
+    }
+
     setHeartbeatDetails(`${integration.providerIdentifier}: publish`);
-    const postNow =
-      allowPending && getIntegration.postPending
-        ? await getIntegration.postPending(
-            integration.internalId,
-            integration.token,
-            mappedPosts,
-            integration
-          )
-        : await getIntegration.post(
-            integration.internalId,
-            integration.token,
-            mappedPosts,
-            integration
-          );
+    let postNow;
+    try {
+      postNow =
+        allowPending && getIntegration.postPending
+          ? await getIntegration.postPending(
+              integration.internalId,
+              integration.token,
+              mappedPosts,
+              integration
+            )
+          : await getIntegration.post(
+              integration.internalId,
+              integration.token,
+              mappedPosts,
+              integration
+            );
+    } catch (err) {
+      // the platform took the post in that case, so it stays counted
+      if (!(err instanceof PublishedWithError)) {
+        await this._usageService
+          .releasePublish(integration.organizationId, reservation)
+          .catch(() => {});
+      }
+      throw err;
+    }
 
     // The post is already published at this point: the streak is best-effort,
     // failing the activity here would retry it and publish again.
@@ -492,7 +541,14 @@ export class PostActivity {
 
   @ActivityMethod()
   async changeState(id: string, state: State, err?: any, body?: any) {
-    await this._postService.changeState(id, state, err, body);
+    try {
+      await this._postService.changeState(id, state, err, body);
+    } catch (e: any) {
+      // the post was removed with its channel or account: nothing to update
+      if (e?.code !== 'P2025') {
+        throw e;
+      }
+    }
   }
 
   @ActivityMethod()

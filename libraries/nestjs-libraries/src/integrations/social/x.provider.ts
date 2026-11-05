@@ -1,8 +1,7 @@
-import { TweetV2, TwitterApi } from 'twitter-api-v2';
+import { TwitterApi } from 'twitter-api-v2';
 import { createHmac, randomBytes } from 'crypto';
 import { parseFragment } from 'parse5';
 import {
-  AnalyticsData,
   AuthTokenDetails,
   PendingCheckResponse,
   PostDetails,
@@ -23,9 +22,9 @@ import { Integration } from '@prisma/client';
 import { timer } from '@gitroom/helpers/utils/timer';
 import { PostPlug } from '@gitroom/helpers/decorators/post.plug';
 import dayjs from 'dayjs';
-import { uniqBy } from 'lodash';
 import { stripHtmlValidation } from '@gitroom/helpers/utils/strip.html.validation';
 import { stripLinks as removeLinks } from '@gitroom/helpers/utils/strip.links';
+import { xAnalyticsAddon } from '@gitroom/nestjs-libraries/database/prisma/subscriptions/pricing';
 import { XDto } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/x.dto';
 import { Rules } from '@gitroom/nestjs-libraries/chat/rules.description.decorator';
 import { hasExtension } from '@gitroom/helpers/utils/has.extension';
@@ -304,7 +303,7 @@ export class XProvider extends SocialAbstract implements SocialProvider {
     title: 'Auto Repost Posts',
     disabled: !!process.env.DISABLE_X_ANALYTICS,
     description:
-      'When a post reached a certain number of likes, repost it to increase engagement (1 week old posts)',
+      'When a post reaches a certain number of likes, repost it to increase engagement (1 week old posts)',
     runEveryMilliseconds: 21600000,
     totalRuns: 3,
     fields: [
@@ -333,8 +332,11 @@ export class XProvider extends SocialAbstract implements SocialProvider {
     });
 
     if (
-      (await client.v2.tweetLikedBy(id)).meta.result_count >=
-      +fields.likesAmount
+      ((
+        await client.v2.singleTweet(id, {
+          'tweet.fields': ['public_metrics'],
+        })
+      ).data?.public_metrics?.like_count || 0) >= +fields.likesAmount
     ) {
       await timer(2000);
       await client.v2.retweet(integration.internalId, id);
@@ -381,7 +383,7 @@ export class XProvider extends SocialAbstract implements SocialProvider {
     title: 'Auto plug post',
     disabled: !!process.env.DISABLE_X_ANALYTICS,
     description:
-      'When a post reached a certain number of likes, add another post to it so you followers get a notification about your promotion',
+      'When a post reaches a certain number of likes, add another post to it so your followers get a notification about your promotion',
     runEveryMilliseconds: 21600000,
     totalRuns: 3,
     fields: [
@@ -417,8 +419,11 @@ export class XProvider extends SocialAbstract implements SocialProvider {
     });
 
     if (
-      (await client.v2.tweetLikedBy(id)).meta.result_count >=
-      +fields.likesAmount
+      ((
+        await client.v2.singleTweet(id, {
+          'tweet.fields': ['public_metrics'],
+        })
+      ).data?.public_metrics?.like_count || 0) >= +fields.likesAmount
     ) {
       await timer(2000);
 
@@ -431,6 +436,18 @@ export class XProvider extends SocialAbstract implements SocialProvider {
     }
 
     return false;
+  }
+
+  async revokeAccess(accessToken: string) {
+    const [accessTokenSplit, accessSecretSplit] = accessToken.split(':');
+    const client = new TwitterApi({
+      appKey: process.env.X_API_KEY!,
+      appSecret: process.env.X_API_SECRET!,
+      accessToken: accessTokenSplit,
+      accessSecret: accessSecretSplit,
+    });
+
+    await client.post('https://api.x.com/1.1/oauth/invalidate_token');
   }
 
   async refreshToken(): Promise<AuthTokenDetails> {
@@ -1503,54 +1520,14 @@ export class XProvider extends SocialAbstract implements SocialProvider {
     ];
   }
 
-  private loadAllTweets = async (
-    client: TwitterApi,
-    id: string,
-    until: string,
-    since: string,
-    token = ''
-  ): Promise<TweetV2[]> => {
-    const tweets = await client.v2.userTimeline(id, {
-      'tweet.fields': ['id'],
-      'user.fields': [],
-      'poll.fields': [],
-      'place.fields': [],
-      'media.fields': [],
-      exclude: ['replies', 'retweets'],
-      start_time: since,
-      end_time: until,
-      max_results: 100,
-      ...(token ? { pagination_token: token } : {}),
-    });
+  meteredAnalytics = process.env.DISABLE_X_ANALYTICS
+    ? undefined
+    : {
+        readAfterHours: [24, 168],
+        postsPerMonth: xAnalyticsAddon.tracked_posts_per_month,
+      };
 
-    const list = tweets.data.data || [];
-
-    return [
-      ...list,
-      ...(list.length === 100 && tweets.meta.next_token
-        ? await this.loadAllTweets(
-            client,
-            id,
-            until,
-            since,
-            tweets.meta.next_token
-          )
-        : []),
-    ];
-  };
-
-  async analytics(
-    id: string,
-    accessToken: string,
-    date: number
-  ): Promise<AnalyticsData[]> {
-    if (process.env.DISABLE_X_ANALYTICS) {
-      return [];
-    }
-
-    const until = dayjs().endOf('day');
-    const since = dayjs().subtract(date > 100 ? 100 : date, 'day');
-
+  async readPostMetrics(accessToken: string, releaseIds: string[]) {
     const [accessTokenSplit, accessSecretSplit] = accessToken.split(':');
     const client = new TwitterApi({
       appKey: process.env.X_API_KEY!,
@@ -1559,164 +1536,24 @@ export class XProvider extends SocialAbstract implements SocialProvider {
       accessSecret: accessSecretSplit,
     });
 
-    try {
-      const tweets = uniqBy(
-        await this.loadAllTweets(
-          client,
-          id,
-          until.format('YYYY-MM-DDTHH:mm:ssZ'),
-          since.format('YYYY-MM-DDTHH:mm:ssZ')
-        ),
-        (p) => p.id
-      );
+    const { data } = await client.v2.tweets(releaseIds, {
+      'tweet.fields': ['public_metrics'],
+    });
 
-      if (tweets.length === 0) {
-        return [];
-      }
-
-      const data = await client.v2.tweets(
-        tweets.map((p) => p.id),
-        {
-          'tweet.fields': ['public_metrics'],
-        }
-      );
-
-      const metrics = data.data.reduce(
-        (all, current) => {
-          all.impression_count =
-            (all.impression_count || 0) +
-            +current.public_metrics.impression_count;
-          all.bookmark_count =
-            (all.bookmark_count || 0) + +current.public_metrics.bookmark_count;
-          all.like_count =
-            (all.like_count || 0) + +current.public_metrics.like_count;
-          all.quote_count =
-            (all.quote_count || 0) + +current.public_metrics.quote_count;
-          all.reply_count =
-            (all.reply_count || 0) + +current.public_metrics.reply_count;
-          all.retweet_count =
-            (all.retweet_count || 0) + +current.public_metrics.retweet_count;
-
-          return all;
+    return (data || []).reduce(
+      (all, tweet) => ({
+        ...all,
+        [tweet.id]: {
+          Impressions: tweet.public_metrics?.impression_count || 0,
+          Likes: tweet.public_metrics?.like_count || 0,
+          Retweets: tweet.public_metrics?.retweet_count || 0,
+          Replies: tweet.public_metrics?.reply_count || 0,
+          Quotes: tweet.public_metrics?.quote_count || 0,
+          Bookmarks: tweet.public_metrics?.bookmark_count || 0,
         },
-        {
-          impression_count: 0,
-          bookmark_count: 0,
-          like_count: 0,
-          quote_count: 0,
-          reply_count: 0,
-          retweet_count: 0,
-        }
-      );
-
-      return Object.entries(metrics).map(([key, value]) => ({
-        label: key.replace('_count', '').replace('_', ' ').toUpperCase(),
-        percentageChange: 5,
-        data: [
-          {
-            total: String(0),
-            date: since.format('YYYY-MM-DD'),
-          },
-          {
-            total: String(value),
-            date: until.format('YYYY-MM-DD'),
-          },
-        ],
-      }));
-    } catch (err) {
-      console.log(err);
-    }
-    return [];
-  }
-
-  async postAnalytics(
-    integrationId: string,
-    accessToken: string,
-    postId: string,
-    date: number
-  ): Promise<AnalyticsData[]> {
-    if (process.env.DISABLE_X_ANALYTICS) {
-      return [];
-    }
-
-    const today = dayjs().format('YYYY-MM-DD');
-
-    const [accessTokenSplit, accessSecretSplit] = accessToken.split(':');
-    const client = new TwitterApi({
-      appKey: process.env.X_API_KEY!,
-      appSecret: process.env.X_API_SECRET!,
-      accessToken: accessTokenSplit,
-      accessSecret: accessSecretSplit,
-    });
-
-    try {
-      // Fetch the specific tweet with public metrics
-      const tweet = await client.v2.singleTweet(postId, {
-        'tweet.fields': ['public_metrics', 'created_at'],
-      });
-
-      if (!tweet?.data?.public_metrics) {
-        return [];
-      }
-
-      const metrics = tweet.data.public_metrics;
-
-      const result: AnalyticsData[] = [];
-
-      if (metrics.impression_count !== undefined) {
-        result.push({
-          label: 'Impressions',
-          percentageChange: 0,
-          data: [{ total: String(metrics.impression_count), date: today }],
-        });
-      }
-
-      if (metrics.like_count !== undefined) {
-        result.push({
-          label: 'Likes',
-          percentageChange: 0,
-          data: [{ total: String(metrics.like_count), date: today }],
-        });
-      }
-
-      if (metrics.retweet_count !== undefined) {
-        result.push({
-          label: 'Retweets',
-          percentageChange: 0,
-          data: [{ total: String(metrics.retweet_count), date: today }],
-        });
-      }
-
-      if (metrics.reply_count !== undefined) {
-        result.push({
-          label: 'Replies',
-          percentageChange: 0,
-          data: [{ total: String(metrics.reply_count), date: today }],
-        });
-      }
-
-      if (metrics.quote_count !== undefined) {
-        result.push({
-          label: 'Quotes',
-          percentageChange: 0,
-          data: [{ total: String(metrics.quote_count), date: today }],
-        });
-      }
-
-      if (metrics.bookmark_count !== undefined) {
-        result.push({
-          label: 'Bookmarks',
-          percentageChange: 0,
-          data: [{ total: String(metrics.bookmark_count), date: today }],
-        });
-      }
-
-      return result;
-    } catch (err) {
-      console.log('Error fetching X post analytics:', err);
-    }
-
-    return [];
+      }),
+      {} as Record<string, Record<string, number>>
+    );
   }
 
   override async mention(token: string, d: { query: string }) {

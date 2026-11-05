@@ -7,6 +7,8 @@ import {
 import { PostsRepository } from '@gitroom/nestjs-libraries/database/prisma/posts/posts.repository';
 import { CreatePostDto } from '@gitroom/nestjs-libraries/dtos/posts/create.post.dto';
 import dayjs from 'dayjs';
+import { PostMetricsService } from '@gitroom/nestjs-libraries/database/prisma/post-metrics/post.metrics.service';
+import { UsageService } from '@gitroom/nestjs-libraries/database/prisma/usage/usage.service';
 import { IntegrationManager } from '@gitroom/nestjs-libraries/integrations/integration.manager';
 import {
   Integration,
@@ -73,7 +75,9 @@ export class PostsService {
     private _mediaService: MediaService,
     private _shortLinkService: ShortLinkService,
     private _temporalService: TemporalService,
-    private _refreshIntegrationService: RefreshIntegrationService
+    private _refreshIntegrationService: RefreshIntegrationService,
+    private _usageService: UsageService,
+    private _postMetricsService: PostMetricsService
   ) {}
 
   searchForMissingThreeHoursPosts() {
@@ -324,6 +328,10 @@ export class PostsService {
     const integrationProvider = this._integrationManager.getSocialIntegration(
       post.integration.providerIdentifier
     );
+
+    if (integrationProvider.meteredAnalytics) {
+      return this._postMetricsService.getPostAnalytics(post.id);
+    }
 
     if (!integrationProvider.postAnalytics) {
       return [];
@@ -924,6 +932,40 @@ export class PostsService {
     return { error: true };
   }
 
+  // Removes the posts for good, deletePost first stops their running workflows
+  async purgePosts(orgId: string, integrationId?: string) {
+    const groups = await this._postRepository.getGroupsToDelete(
+      orgId,
+      integrationId
+    );
+
+    for (const { group } of groups) {
+      await this.deletePost(orgId, group);
+    }
+
+    await this._postRepository.purgePosts(orgId, integrationId);
+  }
+
+  // Whatever is still running for a deleted organization, such as the streak
+  async terminateWorkflows(orgId: string) {
+    try {
+      const workflows = this._temporalService.client
+        .getRawClient()
+        ?.workflow.list({
+          query: `organizationId="${orgId}" AND ExecutionStatus="Running"`,
+        });
+
+      for await (const executionInfo of workflows) {
+        try {
+          const workflow = await this._temporalService.client.getWorkflowHandle(
+            executionInfo.workflowId
+          );
+          await workflow.terminate();
+        } catch (err) {}
+      }
+    } catch (err) {}
+  }
+
   async countPostsFromDay(orgId: string, date: Date) {
     return this._postRepository.countPostsFromDay(orgId, date);
   }
@@ -1151,6 +1193,32 @@ export class PostsService {
   ): Promise<any[]> {
     const postList = [];
     const batchId = uuidv4();
+
+    if (body.type === 'schedule' || body.type === 'now') {
+      const limitMessage = await this._usageService.scheduleLimitMessage(
+        orgId,
+        body.posts.map((post) => {
+          const identifier = (post.settings as any)?.__type;
+          const provider =
+            this._integrationManager.getSocialIntegration(identifier);
+          const value = post.value || [];
+
+          return {
+            providerIdentifier: identifier,
+            date: body.type === 'now' ? new Date() : post.date || body.date,
+            contents: (provider?.comment ? value : value.slice(0, 1)).map(
+              (p) => p.content
+            ),
+            existingIds: value.map((p) => p.id).filter(Boolean),
+          };
+        })
+      );
+
+      if (limitMessage) {
+        throw new BadRequestException(limitMessage);
+      }
+    }
+
     for (const post of body.posts) {
       if (
         (body.type === 'schedule' || body.type === 'now') &&

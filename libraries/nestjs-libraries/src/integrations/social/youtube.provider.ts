@@ -282,6 +282,14 @@ export class YoutubeProvider extends SocialAbstract implements SocialProvider {
     return undefined;
   }
 
+  async revokeAccess(accessToken: string, refreshToken: string | null) {
+    await fetch('https://oauth2.googleapis.com/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ token: refreshToken || accessToken }),
+    });
+  }
+
   async refreshToken(refresh_token: string): Promise<AuthTokenDetails> {
     const { client, oauth2 } = clientAndYoutube();
     client.setCredentials({ refresh_token });

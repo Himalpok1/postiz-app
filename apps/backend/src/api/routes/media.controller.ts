@@ -104,6 +104,12 @@ export class MediaController {
     }
 
     if (preventSave === 'true') {
+      await this._mediaService.saveThumbnail(
+        org.id,
+        file.filename,
+        file.path,
+        file.originalname
+      );
       return { path: file.path };
     }
 

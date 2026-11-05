@@ -5,16 +5,22 @@ import { UserDetailDto } from '@gitroom/nestjs-libraries/dtos/users/user.details
 import { EmailNotificationsDto } from '@gitroom/nestjs-libraries/dtos/users/email-notifications.dto';
 import { TimezoneDto } from '@gitroom/nestjs-libraries/dtos/users/timezone.dto';
 import { OrganizationRepository } from '@gitroom/nestjs-libraries/database/prisma/organizations/organization.repository';
-import { IntegrationRepository } from '@gitroom/nestjs-libraries/database/prisma/integrations/integration.repository';
 import { NotificationService } from '@gitroom/nestjs-libraries/database/prisma/notifications/notification.service';
+import { PostsService } from '@gitroom/nestjs-libraries/database/prisma/posts/posts.service';
+import { IntegrationService } from '@gitroom/nestjs-libraries/database/prisma/integrations/integration.service';
+import { MediaService } from '@gitroom/nestjs-libraries/database/prisma/media/media.service';
+import { UsageService } from '@gitroom/nestjs-libraries/database/prisma/usage/usage.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private _usersRepository: UsersRepository,
     private _organizationRepository: OrganizationRepository,
-    private _integrationRepository: IntegrationRepository,
-    private _notificationService: NotificationService
+    private _notificationService: NotificationService,
+    private _postsService: PostsService,
+    private _integrationService: IntegrationService,
+    private _mediaService: MediaService,
+    private _usageService: UsageService
   ) {}
 
   private readonly _logger = new Logger(UsersService.name);
@@ -134,7 +140,12 @@ export class UsersService {
           }
         }
 
-        await this._integrationRepository.deleteIntegrationsForAccount(org.id);
+        await this._postsService.purgePosts(org.id);
+        await this._postsService.terminateWorkflows(org.id);
+        await this._integrationService.deleteChannelsForAccount(org.id);
+        await this._mediaService.deleteAllMedia(org.id);
+        await this._usageService.deleteAllUsage(org.id);
+        // last: a retry can only find an organization that isn't deleted yet
         await this._organizationRepository.deleteOrganization(org.id);
       } else {
         await this._organizationRepository.deleteTeamMember(org.id, userId);

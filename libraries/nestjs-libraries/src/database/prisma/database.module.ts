@@ -13,6 +13,10 @@ import { PostsService } from '@gitroom/nestjs-libraries/database/prisma/posts/po
 import { PostsRepository } from '@gitroom/nestjs-libraries/database/prisma/posts/posts.repository';
 import { IntegrationManager } from '@gitroom/nestjs-libraries/integrations/integration.manager';
 import { MediaService } from '@gitroom/nestjs-libraries/database/prisma/media/media.service';
+import { UsageService } from '@gitroom/nestjs-libraries/database/prisma/usage/usage.service';
+import { UsageRepository } from '@gitroom/nestjs-libraries/database/prisma/usage/usage.repository';
+import { PostMetricsService } from '@gitroom/nestjs-libraries/database/prisma/post-metrics/post.metrics.service';
+import { PostMetricsRepository } from '@gitroom/nestjs-libraries/database/prisma/post-metrics/post.metrics.repository';
 import { MediaRepository } from '@gitroom/nestjs-libraries/database/prisma/media/media.repository';
 import { NotificationsRepository } from '@gitroom/nestjs-libraries/database/prisma/notifications/notifications.repository';
 import { EmailService } from '@gitroom/nestjs-libraries/services/email.service';
@@ -83,6 +87,10 @@ import { AdminStatsService } from '@gitroom/nestjs-libraries/database/prisma/adm
     SignatureService,
     MediaService,
     MediaRepository,
+    UsageService,
+    UsageRepository,
+    PostMetricsService,
+    PostMetricsRepository,
     AgenciesService,
     AgenciesRepository,
     IntegrationManager,

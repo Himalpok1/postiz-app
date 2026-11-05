@@ -137,6 +137,7 @@ export class IntegrationsController {
             display: p.profile,
             type: p.type,
             time: JSON.parse(p.postingTimes),
+            delayedAnalytics: !!findIntegration?.meteredAnalytics,
             changeProfilePicture: !!findIntegration?.changeProfilePicture,
             changeNickName: !!findIntegration?.changeNickname,
             customer: p.customer,
@@ -452,16 +453,7 @@ export class IntegrationsController {
     @GetOrgFromRequest() org: Organization,
     @Body('id') id: string
   ) {
-    const isTherePosts = await this._integrationService.getPostsForChannel(
-      org.id,
-      id
-    );
-    if (isTherePosts.length) {
-      for (const post of isTherePosts) {
-        this._postService.deletePost(org.id, post.group).catch((err) => {});
-      }
-    }
-
+    await this._postService.purgePosts(org.id, id);
     return this._integrationService.deleteChannel(org.id, id);
   }
 
