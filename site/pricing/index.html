@@ -35,7 +35,7 @@
 <input type="radio" name="period" id="period-year"><label for="period-year">Annual, pay for 10 months</label>
 </fieldset>
 <div class="sheet"><div class="scroller" tabindex="0" role="region" aria-label="Plan comparison"><table class="compare">
-<thead><tr><th scope="col">Plan</th><th scope="col">Starter</th><th scope="col">Team</th><th scope="col">Pro</th><th scope="col">Agency</th></tr></thead>
+<thead><tr><th scope="col">Plan</th><th scope="col">Starter</th><th scope="col">Team</th><th scope="col">Pro</th><th scope="col">Scale</th></tr></thead>
 <tbody>
 <tr><th scope="row">Price <span class="price--month">a month</span><span class="price--year">a year</span></th><td><span class="price--month">$19</span><span class="price--year">$190</span></td><td><span class="price--month">$29</span><span class="price--year">$290</span></td><td><span class="price--month">$39</span><span class="price--year">$390</span></td><td><span class="price--month">$79</span><span class="price--year">$790</span></td></tr>
 <tr><th scope="row">Channels</th><td>5</td><td>10</td><td>30</td><td>100</td></tr>
@@ -71,15 +71,12 @@
 <footer class="foot">
 <div class="container">
 <a class="foot__mark" href="/" aria-label="Castrapid home"><img src="/img/wordmark.svg" width="680" height="128" alt=""></a>
-<ul class="foot__links">
-<li><a href="/features">Features</a></li>
-<li><a href="/channels">Channels</a></li>
-<li><a href="/pricing">Pricing</a></li>
-<li><a href="/auth/login">Log in</a></li>
-<li><a href="/terms">Terms of Service</a></li>
-<li><a href="/privacy">Privacy Policy</a></li>
-<li><a href="https://github.com/Himalpok1/postiz-app">Source code (AGPL-3.0)</a></li>
-</ul>
+<div class="foot__cols">
+<div><p class="foot__title">Product</p><ul class="foot__links"><li><a href="/features">Features</a></li><li><a href="/channels">Channels</a></li><li><a href="/pricing">Pricing</a></li><li><a href="/auth/login">Log in</a></li></ul></div>
+<div><p class="foot__title">Legal</p><ul class="foot__links"><li><a href="/terms">Terms of Service</a></li><li><a href="/privacy">Privacy Policy</a></li></ul></div>
+<div><p class="foot__title">Open source</p><ul class="foot__links"><li><a href="https://github.com/Himalpok1/postiz-app">Source code (AGPL-3.0)</a></li></ul></div>
+<div><p class="foot__title">Contact</p><ul class="foot__links"><li><a href="mailto:support@castrapid.com">support@castrapid.com</a></li></ul></div>
+</div>
 
 </div>
 </footer>

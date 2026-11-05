@@ -49,7 +49,7 @@ export const planDisplayName: Record<string, string> = {
   STANDARD: 'Starter',
   TEAM: 'Team',
   PRO: 'Pro',
-  ULTIMATE: 'Agency',
+  ULTIMATE: 'Scale',
 };
 export const pricing: PricingInterface = {
   FREE: {
