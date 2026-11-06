@@ -159,7 +159,7 @@ export const Component: FC<{
               className={clsx(
                 modal.fullScreen
                   ? 'w-full h-full flex-1 mobile:min-w-0 mobile:h-auto'
-                  : 'mx-auto py-[48px] mobile:max-w-[100vw] mobile:py-[16px]'
+                  : 'mx-auto max-w-full py-[48px] mobile:max-w-[100vw] mobile:py-[16px]'
               )}
               {...(modal.size && { style: { width: modal.size } })}
             >
@@ -179,11 +179,11 @@ export const Component: FC<{
         onClick={closeModalFunction}
         style={{ zIndex }}
         className={clsx(
-          'fixed flex left-0 top-0 min-w-full min-h-full bg-popup transition animate-fadeIn overflow-y-auto text-newTextColor',
+          'fixed flex inset-0 w-full h-dvh bg-popup transition animate-fadeIn overflow-y-auto text-newTextColor',
           !modal.fullScreen && 'pb-[50px]'
         )}
       >
-        <div className="relative flex-1">
+        <div className="relative flex-1 min-w-0">
           <div
             style={
               modal.top
@@ -206,7 +206,7 @@ export const Component: FC<{
               className={clsx(
                 !modal.removeLayout &&
                   'gap-[40px] p-[32px] mobile:gap-[24px] mobile:p-[16px]',
-                'bg-newBgColorInner mx-auto flex flex-col w-fit rounded-[24px] mobile:rounded-[16px] relative mobile:!max-w-full',
+                'bg-newBgColorInner mx-auto flex min-w-0 max-w-[calc(100vw-32px)] flex-col w-fit rounded-[24px] mobile:rounded-[16px] relative mobile:!max-w-full mobile:overflow-x-auto',
                 modal.destructive && 'border-2 border-red-700',
                 modal.size ? '' : 'min-w-[600px] mobile:min-w-0 mobile:w-full',
                 modal.fullScreen && 'h-full'

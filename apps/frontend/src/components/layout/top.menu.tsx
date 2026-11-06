@@ -153,7 +153,7 @@ export const TopMenu: FC = () => {
   const { firstMenu, secondMenu } = useMenuItem();
   const { isGeneral, billingEnabled } = useVariables();
   return (
-    <div className="flex flex-col gap-[8px] mobile:flex-row">
+    <div className="flex min-w-0 flex-col gap-[8px] mobile:flex-row mobile:overflow-x-auto mobile:pb-[4px]">
       <div className="contents blurMe">
         {
           // @ts-ignore

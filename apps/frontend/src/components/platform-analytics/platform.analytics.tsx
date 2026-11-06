@@ -171,9 +171,7 @@ export const PlatformAnalytics = () => {
             'Connect one of these channels to see how your posts do'
           )}
         </div>
-        <div className="text-[20px]">
-          {analyticsChannelNames.join(', ')}
-        </div>
+        <div className="text-[20px]">{analyticsChannelNames.join(', ')}</div>
         <Button onClick={() => router.push('/launches')}>
           {t(
             'go_to_the_calendar_to_add_channels',
@@ -288,7 +286,7 @@ export const PlatformAnalytics = () => {
           </div>
         </div>
       </div>
-      <div className="bg-newBgColorInner flex-1 flex-col flex p-[20px] mobile:p-[12px] gap-[12px]">
+      <div className="bg-newBgColorInner min-w-0 flex-1 flex-col flex p-[20px] mobile:p-[12px] gap-[12px]">
         {!!options.length && (
           <div className="flex-1 flex flex-col gap-[14px]">
             <div className="max-w-[200px]">

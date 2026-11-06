@@ -44,17 +44,17 @@ export const CreatePostLink: FC<{ className: string }> = ({ className }) => {
   );
 };
 
-export const MenuItem: FC<{ label: string; icon: ReactNode; path: string; onClick?: () => void }> = ({
-  label,
-  icon,
-  path,
-  onClick,
-}) => {
+export const MenuItem: FC<{
+  label: string;
+  icon: ReactNode;
+  path: string;
+  onClick?: () => void;
+}> = ({ label, icon, path, onClick }) => {
   const currentPath = usePathname();
   const isActive = currentPath.indexOf(path) === 0;
 
   const className = clsx(
-    'w-full h-[48px] mobile:h-[40px] mobile:w-auto mobile:shrink-0 px-[16px] flex items-center gap-[12px] mobile:gap-[8px] rounded-card font-[600] text-[16px] mobile:text-[14px] text-ink whitespace-nowrap transition-colors duration-[120ms] active:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&_svg]:w-[18px] [&_svg]:h-[18px] [&_svg]:shrink-0',
+    'w-full h-[48px] mobile:h-[44px] mobile:w-auto mobile:shrink-0 px-[16px] flex items-center gap-[12px] mobile:gap-[8px] rounded-card font-[600] text-[16px] mobile:text-[14px] text-ink whitespace-nowrap transition-colors duration-[120ms] active:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&_svg]:w-[18px] [&_svg]:h-[18px] [&_svg]:shrink-0',
     isActive
       ? 'bg-paper2 outline outline-1 outline-rule'
       : `${tileColor[roomForPath(path)]} hover:bg-paper2`
@@ -81,7 +81,7 @@ export const MenuItem: FC<{ label: string; icon: ReactNode; path: string; onClic
       href={path}
       title={label}
       aria-current={isActive ? 'page' : undefined}
-      {...path.indexOf('http') === 0 && { target: '_blank' }}
+      {...(path.indexOf('http') === 0 && { target: '_blank' })}
       className={className}
     >
       {inner}

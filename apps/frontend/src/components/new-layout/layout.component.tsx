@@ -98,23 +98,23 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
           <PreConditionComponent />
           <NewSubscription />
           <ContinueProvider />
-          <div className="flex flex-col min-h-screen min-w-screen bg-room text-newTextColor p-[16px] mobile:p-[8px] mobile:pb-[80px] transition-colors duration-[220ms]">
+          <div className="flex flex-col min-h-screen min-h-dvh w-full min-w-0 bg-room text-newTextColor p-[16px] mobile:p-[8px] mobile:pb-[max(24px,env(safe-area-inset-bottom))] transition-colors duration-[220ms]">
             <div>{user?.admin ? <Impersonate /> : <div />}</div>
             {user.tier === 'FREE' && isGeneral && billingEnabled ? (
               <FirstBillingComponent />
             ) : (
               <>
                 <AnnouncementBanner />
-                <div className="flex-1 flex gap-[16px] mobile:flex-col mobile:gap-[8px]">
+                <div className="flex-1 min-w-0 flex gap-[16px] mobile:flex-col mobile:gap-[8px]">
                   <Support />
                   <nav
                     id="left-menu"
                     aria-label="Main"
                     className={clsx(
-                      'flex flex-col gap-[16px] w-[192px] shrink-0 sticky top-[16px] self-start max-h-[calc(100vh-32px)] overflow-y-auto overflow-x-hidden mobile:static mobile:w-full mobile:max-h-none mobile:flex-row mobile:items-center mobile:gap-[8px] mobile:overflow-x-auto mobile:overflow-y-hidden'
+                      'flex flex-col gap-[16px] w-[192px] shrink-0 sticky top-[16px] self-start max-h-[calc(100vh-32px)] overflow-y-auto overflow-x-hidden mobile:static mobile:w-full mobile:max-h-none mobile:flex-col mobile:items-stretch mobile:gap-[12px] mobile:overflow-visible'
                     )}
                   >
-                    <div className="px-[8px] pt-[8px] mobile:p-0 mobile:shrink-0 mobile:sticky mobile:start-0 mobile:z-[10] mobile:bg-room mobile:flex mobile:items-center mobile:gap-[8px]">
+                    <div className="px-[8px] pt-[8px] mobile:p-0 mobile:shrink-0 mobile:flex mobile:items-center mobile:justify-between mobile:gap-[8px]">
                       <Logo />
                       {pathname.indexOf('/launches') !== 0 && (
                         <CreatePostLink className="hidden mobile:flex px-[14px] h-[40px]" />
@@ -129,11 +129,11 @@ export const LayoutComponent = ({ children }: { children: ReactNode }) => {
                   </nav>
                   <div className="flex-1 min-w-0 bg-newBgColorInner rounded-sheet overflow-hidden flex flex-col blurMe mobile:rounded-[20px]">
                     {/* relative: the notifications popup spans this bar on phones */}
-                    <div className="relative flex h-[72px] mobile:h-[56px] px-[24px] mobile:px-[12px] gap-[12px] items-center border-b border-rule">
-                      <div className="text-[24px] mobile:text-[20px] font-[700] flex flex-1 min-w-0">
+                    <div className="relative flex shrink-0 min-h-[72px] mobile:min-h-[56px] mobile:flex-wrap mobile:py-[12px] px-[24px] mobile:px-[12px] gap-[12px] items-center border-b border-rule">
+                      <div className="text-[24px] mobile:text-[20px] font-[700] flex flex-1 min-w-0 mobile:basis-full">
                         <Title />
                       </div>
-                      <div className="flex gap-[20px] mobile:gap-[14px] items-center text-textItemBlur">
+                      <div className="flex shrink-0 gap-[20px] mobile:gap-[16px] mobile:flex-wrap mobile:w-full items-center text-textItemBlur">
                         <StreakComponent />
                         <div className="w-[1px] h-[20px] bg-blockSeparator mobile:hidden" />
                         <OrganizationSelector />
