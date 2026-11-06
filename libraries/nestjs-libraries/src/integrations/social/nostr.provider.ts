@@ -33,7 +33,7 @@ export class NostrProvider extends SocialAbstract implements SocialProvider {
   isBetweenSteps = false;
   scopes = [] as string[];
   editor = 'normal' as const;
-  toolTip = 'Make sure you private a HEX key of your Nostr private key, you can get it from websites like iris.to'
+  toolTip = 'Enter your Nostr private key in HEX format. Sites like iris.to can show it to you.'
 
   maxLength() {
     return 100000;

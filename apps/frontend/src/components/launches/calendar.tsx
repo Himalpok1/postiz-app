@@ -485,6 +485,23 @@ export const DayView = () => {
     );
     return upcoming === -1 ? options.length : upcoming;
   }, [options, startDate, now]);
+  const t = useT();
+
+  if (!options.length) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-[24px] min-h-[200px] text-center text-[14px] text-muted">
+        {integrations.length
+          ? t(
+              'day_view_no_slots',
+              'No posting times or posts on this day. Try Week to see more.'
+            )
+          : t(
+              'day_view_no_channels',
+              'Connect a channel and its posting times will show up here.'
+            )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-[10px] flex-1 relative">

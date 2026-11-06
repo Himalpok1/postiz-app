@@ -98,12 +98,12 @@ export const Plugs = () => {
           <div className="text-customColor18">
             {t(
               'there_are_not_plugs_matching_your_channels',
-              'There are not plugs matching your channels'
+              'No plugs work with your channels yet'
             )}
             <br />
             {t(
               'you_have_to_add_x_linkedin_page_threads_or_bluesky',
-              'You have to add: X, LinkedIn Page, Threads or Bluesky'
+              'Plugs work with X, LinkedIn Page, Threads and Bluesky.'
             )}
           </div>
           <Button onClick={() => router.push('/launches')}>

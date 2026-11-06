@@ -98,7 +98,15 @@ export function RegisterAfter({
     neynarClientId,
     appleClientId,
     billingEnabled,
+    googleLogin,
   } = useVariables();
+  const hasLoginProvider =
+    !isGeneral ||
+    genericOauth ||
+    googleLogin ||
+    !!appleClientId ||
+    !!neynarClientId ||
+    billingEnabled;
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const fireEvents = useFireEvents();
@@ -162,9 +170,13 @@ export function RegisterAfter({
               {t('sign_up', 'Sign Up')}
             </h1>
           </div>
-          <div className="text-[14px] mt-[32px] mb-[12px]">
-            {t('continue_with', 'Continue With')}
-          </div>
+          {hasLoginProvider ? (
+            <div className="text-[14px] mt-[32px] mb-[12px]">
+              {t('continue_with', 'Continue With')}
+            </div>
+          ) : (
+            <div className="mt-[32px]" />
+          )}
           <div className="flex flex-col text-[14px]">
             {!isAfterProvider &&
               (!isGeneral ? (
@@ -174,14 +186,14 @@ export function RegisterAfter({
                   {genericOauth && isGeneral ? (
                     <OauthProvider />
                   ) : (
-                    <GoogleProvider />
+                    googleLogin && <GoogleProvider />
                   )}
                   {!!appleClientId && <AppleProvider />}
                   {!!neynarClientId && <FarcasterProvider />}
                   {billingEnabled && <WalletProvider />}
                 </div>
               ))}
-            {!isAfterProvider && (
+            {!isAfterProvider && hasLoginProvider && (
               <div className="h-[20px] mb-[24px] mt-[24px] relative">
                 <div className="absolute w-full h-[1px] bg-fifth top-[50%] -translate-y-[50%]" />
                 <div

@@ -84,7 +84,7 @@ export class XProvider extends SocialAbstract implements SocialProvider {
   // status checks behind uploads.
   override maxConcurrentJob = 10;
   toolTip =
-    'You will be logged in into your current account, if you would like a different account, change it first on X';
+    "You'll connect the account you're signed in to on X. To use a different one, switch accounts on X first.";
 
   // The provider receives the rich HTML so articles keep their formatting;
   // regular tweets are stripped to plain text inside the provider.

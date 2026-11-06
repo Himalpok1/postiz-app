@@ -50,15 +50,15 @@
   "user": "User",
   "login_register_to_add_comments": "Login / Register to add comments",
   "status": "Status:",
-  "there_are_not_plugs_matching_your_channels": "There are not plugs matching your channels",
-  "you_have_to_add_x_linkedin_page_threads_or_bluesky": "You have to add: X, LinkedIn Page, Threads or Bluesky",
+  "there_are_not_plugs_matching_your_channels": "No plugs work with your channels yet",
+  "you_have_to_add_x_linkedin_page_threads_or_bluesky": "Plugs work with X, LinkedIn Page, Threads and Bluesky.",
   "go_to_the_calendar_to_add_channels": "Go to the calendar to add channels",
   "channels": "Channels",
   "activate": "Activate",
   "this_channel_needs_to_be_refreshed": "This channel needs to be refreshed,",
   "click_here_to_refresh": "click here to refresh",
-  "can_t_show_analytics_yet": "Can't show analytics yet",
-  "you_have_to_add_social_media_channels": "You have to add Social Media channels",
+  "can_t_show_analytics_yet": "No analytics yet",
+  "you_have_to_add_social_media_channels": "Connect one of these channels to see how your posts do",
   "supported": "Supported:",
   "step": "STEP",
   "skip_onboarding": "Skip onboarding",
@@ -920,5 +920,7 @@
   "ai_tools_connected": "Connected tools",
   "first_run_show_draft": "Show my draft",
   "ai_tools_try": "Try it",
-  "ai_tools_try_body": "Ask your tool: \"Draft three posts for next week and save them as drafts.\""
+  "ai_tools_try_body": "Ask your tool: \"Draft three posts for next week and save them as drafts.\"",
+  "day_view_no_slots": "No posting times or posts on this day. Try Week to see more.",
+  "day_view_no_channels": "Connect a channel and its posting times will show up here."
 }

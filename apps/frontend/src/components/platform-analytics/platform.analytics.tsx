@@ -1,8 +1,8 @@
 'use client';
 
+import { orderBy } from 'lodash';
 import useSWR from 'swr';
 import { useCallback, useMemo, useState } from 'react';
-import { capitalize, orderBy } from 'lodash';
 import clsx from 'clsx';
 import ImageWithFallback from '@gitroom/react/helpers/image.with.fallback';
 import SafeImage from '@gitroom/react/helpers/safe.image';
@@ -29,6 +29,17 @@ const allowedIntegrations = [
   'pinterest',
   'threads',
   'x',
+];
+const analyticsChannelNames = [
+  'Facebook',
+  'Instagram',
+  'LinkedIn Page',
+  'TikTok',
+  'YouTube',
+  'Google My Business',
+  'Pinterest',
+  'Threads',
+  'X',
 ];
 export const PlatformAnalytics = () => {
   const fetch = useFetch();
@@ -153,16 +164,15 @@ export const PlatformAnalytics = () => {
           <img src="/peoplemarketplace.svg" />
         </div>
         <div className="text-[48px]">
-          {t('can_t_show_analytics_yet', "Can't show analytics yet")}
+          {t('can_t_show_analytics_yet', 'No analytics yet')}
           <br />
           {t(
             'you_have_to_add_social_media_channels',
-            'You have to add Social Media channels'
+            'Connect one of these channels to see how your posts do'
           )}
         </div>
         <div className="text-[20px]">
-          {t('supported', 'Supported:')}
-          {allowedIntegrations.map((p) => capitalize(p)).join(', ')}
+          {analyticsChannelNames.join(', ')}
         </div>
         <Button onClick={() => router.push('/launches')}>
           {t(
